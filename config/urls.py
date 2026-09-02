@@ -25,4 +25,5 @@ def home_page_view(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_page_view),
+    path('', include('eshop.urls')),
 ]

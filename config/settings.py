@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Собственные
-    'esop',
+    'eshop',
 ]
 
 MIDDLEWARE = [
