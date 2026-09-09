@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastronom | Все товары</title>
+</head>
+
+<body>
+    <h1>Все товары магазина Gastronom</h1>
+
+    {# Отображение товаров из базы данных #}
+    {% if products %}
+        {% for product in products %}
+            <div class="product-container" style="background-color: #1c524d; color: white; border: 1px solid black; margin-bottom: 10px; padding: 15px; border-radius: 5px;">
+                <h2>{{ product.title }}</h2>
+                <p>{{ product.text }}</p>
+                <small>Дата добавления товара: {{ product.created_at }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Товаров ещё нет. Загляните позже!</p>
+    {% endif %} 
+</body>
+</html>
