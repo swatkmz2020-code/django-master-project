@@ -1,19 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gastronom | Товары {{ product.title }}</title>
-</head>
+{% extends "eshop/base.html" %}
 
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'eshop:home_page' %}">Главная</a>
-            <a href="{% url 'eshop:product_list' %}">Товары</a>
-        </nav>
-    </header>
+{% block page_title %}
+    Gastronom | {{ product.title }}
+{% endblock page_title %}
 
+{% block page_content %}
     <a href="javascript:history.back()">&larr; Назад</a>
 
     <h1>Детали товара:</h1>
@@ -21,5 +12,4 @@
     <h3>{{ product.title }}</h3>
     <p>{{ product.text }}</p>
     <p>{{ product.created_at }}</p>
-</body>
-</html>
+{% endblock page_content %}
