@@ -10,10 +10,12 @@
     <header>
         <nav>
             <a href="{% url 'eshop:home_page' %}">Главная</a>
-            <a href="{% url 'eshop:product_list' %}">Посты</a>
+            <a href="{% url 'eshop:product_list' %}">Товары</a>
         </nav>
     </header>
 
     <main>{% block page_content %}{% endblock page_content %}</main>
+
+    <footer>&copy; Все права защищены 2026</footer>
 </body>
 </html>
