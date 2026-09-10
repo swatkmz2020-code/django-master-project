@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gastronom | Все товары</title>
+    <title>Gastronom | Товары</title>
 </head>
 
 <body>
@@ -19,8 +19,16 @@
     {% if products %}
         {% for product in products %}
             <div class="product-container" style="background-color: #1c524d; color: white; border: 1px solid black; margin-bottom: 10px; padding: 15px; border-radius: 5px;">
-                <h2>{{ product.title }}</h2>
-                <p>{{ product.text }}</p>
+                <h2>
+                    <a href="{% url 'eshop:product_detail' product_id=product.id %}"> 
+                        {{ product.title }}
+                    </a>
+                </h2>
+                <p><strong>Описание товара:</strong> {{ product.text }}</p>
+                <p style="margin-top: 15px; margin-bottom: 15px;">
+                <strong>Цена:</strong> 
+                <span style="font-size: 1.25em; color: #ffeb3b; font-weight: bold;">{{ product.price }} ₽</span>
+            </p>
                 <small>Дата добавления товара: {{ product.created_at }}</small>
             </div>
         {% endfor %}
