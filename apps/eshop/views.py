@@ -26,10 +26,20 @@ def product_add_view(request):
         errors = {}
         if not title:
             errors['title'] = 'Название товара обязательно к заполнению.'
+        elif len(title) < 6:
+            errors['title'] = 'Название товара должно содержать минимум 6 символов.'
         if not text:
             errors['text'] = 'Описание товара обязательно к заполнению.'
         if not price:
             errors['price'] = 'Цена товара обязательна к заполнению.'
+        else:
+            try:
+                # Переводим в число для проверки (учитываем запятые)
+                price_num = float(price.replace(',', '.'))
+                if price_num <= 0:
+                    errors['price'] = 'Цена товара должна быть больше 0.'
+            except ValueError:
+                errors['price'] = 'Введите корректное число для цены.'
 
         if errors:
             context = {
