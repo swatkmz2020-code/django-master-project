@@ -19,11 +19,29 @@ def product_detail_view(request, product_id):
 
 def product_add_view(request):
     if request.method == "POST":
-        product = Product.objects.create(
-            title=request.POST['title'],
-            text=request.POST['text'],
-            price=request.POST.get('price', '0.00')
-        )
+        title = request.POST['title'].strip()
+        text = request.POST['text'].strip()
+        price = request.POST['price'].strip()
+
+        errors = {}
+        if not title:
+            errors['title'] = 'Название товара обязательно к заполнению.'
+        if not text:
+            errors['text'] = 'Описание товара обязательно к заполнению.'
+        if not price:
+            errors['price'] = 'Цена товара обязательна к заполнению.'
+
+        if errors:
+            context = {
+                'errors': errors,
+                'title': title,
+                'text': text,
+                'price': price
+            }
+            return render(request, 'eshop/product_add.html', context)
+
+        product = Product.objects.create(title=title, text=text, price=price)
+        
         return redirect('eshop:product_detail', product_id=product.pk)
         
     # Все остальные запросы (включая GET) уходят сюда
