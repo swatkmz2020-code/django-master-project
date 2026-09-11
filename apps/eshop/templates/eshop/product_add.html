@@ -1,0 +1,44 @@
+{% extends "eshop/base.html" %}
+
+{% block page_title %}
+    Gastronom | Добавить товар
+{% endblock page_title %}
+
+{% block page_content %}
+    <h1>Новый продукт</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div>
+            <label for="titleInput">Название товара:</label>
+            <input
+                id="titleInput"
+                name="title"
+                type="text"
+                placeholder="Максимальная длина 200 символов"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="textInput">Описание товара:</label>
+            <textarea id="textInput" name="text" rows="3"></textarea>
+        </div>
+
+        <div>
+            <label for="priceInput">Цена товара (₽):</label>
+            <input 
+                id="priceInput"
+                name="price" 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                placeholder="0.00" 
+                required
+            >
+        </div>
+
+        <button type="submit">Добавить</button>
+    </form>
+{% endblock page_content %}
