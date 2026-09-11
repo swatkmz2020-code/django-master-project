@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from eshop.models import Product
 
@@ -16,3 +16,15 @@ def product_detail_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     return render(request, 'eshop/product_detail.html', {'product': product})
 
+
+def product_add_view(request):
+    if request.method == "POST":
+        product = Product.objects.create(
+            title=request.POST['title'],
+            text=request.POST['text'],
+            price=request.POST.get('price', '0.00')
+        )
+        return redirect('eshop:product_detail', product_id=product.pk)
+        
+    # Все остальные запросы (включая GET) уходят сюда
+    return render(request, 'eshop/product_add.html')
