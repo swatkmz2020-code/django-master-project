@@ -21,7 +21,7 @@
                 <strong>Цена:</strong> 
                 <span style="font-size: 1.25em; color: #ffeb3b; font-weight: bold;">{{ product.price }} ₽</span>
             </p>
-                <small>Дата добавления товара: {{ product.created_at }}</small>
+                <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
             </div>
         {% endfor %}
     {% else %}

@@ -11,5 +11,5 @@
     <h2>ID товара: {{ prroduct.id }}</h2>
     <h3>{{ product.title }}</h3>
     <p>{{ product.text }}</p>
-    <p>{{ product.created_at }}</p>
+    <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
 {% endblock page_content %}
