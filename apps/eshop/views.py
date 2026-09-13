@@ -23,11 +23,7 @@ def product_add_view(request):
 
         if request.method == "POST":
             if form.is_valid():
-                product = Product.objects.create(
-                    title=form.cleaned_data['title'],
-                    text=form.cleaned_data['text'],
-                    price=form.cleaned_data['price']
-                )
+                product = form.save()
                 return redirect('eshop:product_detail', product_id=product.pk)
 
             
