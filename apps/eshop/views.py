@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
+from eshop.forms import PostForm
 from eshop.models import Product
 
 
@@ -19,40 +20,17 @@ def product_detail_view(request, product_id):
 
 def product_add_view(request):
     if request.method == "POST":
-        title = request.POST['title'].strip()
-        text = request.POST['text'].strip()
-        price = request.POST['price'].strip()
+        form = PostForm(request.POST)
 
-        errors = {}
-        if not title:
-            errors['title'] = 'Название товара обязательно к заполнению.'
-        elif len(title) < 6:
-            errors['title'] = 'Название товара должно содержать минимум 6 символов.'
-        if not text:
-            errors['text'] = 'Описание товара обязательно к заполнению.'
-        if not price:
-            errors['price'] = 'Цена товара обязательна к заполнению.'
-        else:
-            try:
-                # Переводим в число для проверки (учитываем запятые)
-                price_num = float(price.replace(',', '.'))
-                if price_num <= 0:
-                    errors['price'] = 'Цена товара должна быть больше 0.'
-            except ValueError:
-                errors['price'] = 'Введите корректное число для цены.'
+        if form.is_valid():
+            product = Product.objects.create(
+                title=form.cleaned_data['title'],
+                text=form.cleaned_data['text'],
+                price=form.cleaned_data['price']
+            )
+            return redirect('eshop:product_detail', product_id=product.pk)
 
-        if errors:
-            context = {
-                'errors': errors,
-                'title': title,
-                'text': text,
-                'price': price
-            }
-            return render(request, 'eshop/pages/product_add.html', context)
+        return render(request, 'eshop/pages/product_add.html', {"form": form})
 
-        product = Product.objects.create(title=title, text=text, price=price)
-        
-        return redirect('eshop:product_detail', product_id=product.pk)
-        
-    # Все остальные запросы (включая GET) уходят сюда
-    return render(request, 'eshop/pages/product_add.html')
+    form = PostForm()
+    return render(request, 'eshop/pages/product_add.html', {"form": form})
