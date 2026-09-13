@@ -19,18 +19,16 @@ def product_detail_view(request, product_id):
 
 
 def product_add_view(request):
-    if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST or None)
 
-        if form.is_valid():
-            product = Product.objects.create(
-                title=form.cleaned_data['title'],
-                text=form.cleaned_data['text'],
-                price=form.cleaned_data['price']
-            )
-            return redirect('eshop:product_detail', product_id=product.pk)
+        if request.method == "POST":
+            if form.is_valid():
+                product = Product.objects.create(
+                    title=form.cleaned_data['title'],
+                    text=form.cleaned_data['text'],
+                    price=form.cleaned_data['price']
+                )
+                return redirect('eshop:product_detail', product_id=product.pk)
 
+            
         return render(request, 'eshop/pages/product_add.html', {"form": form})
-
-    form = PostForm()
-    return render(request, 'eshop/pages/product_add.html', {"form": form})
