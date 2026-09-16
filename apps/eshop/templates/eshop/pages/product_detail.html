@@ -15,9 +15,6 @@
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
 
     <a href="{% url 'eshop:product_edit' product_id=product.id %}">Редактировать</a>
-    <form method="POST" action="{% url 'eshop:product_remove' product_id=product.id %}">
-        {% csrf_token %}
-        <button type="submit">Удалить</button>
-    </form>
+    <a href="{% url 'eshop:product_remove' product_id=product.id %}">Удалить</a>
 {% endblock page_content %}
 

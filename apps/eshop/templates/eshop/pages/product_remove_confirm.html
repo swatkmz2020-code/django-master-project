@@ -1,0 +1,16 @@
+{% extends "eshop/base.html" %}
+
+{% block page_title %}
+    Gastronom | Подтверждение удаления товара
+{% endblock page_title %}
+
+{% block page_content %}
+    <h1>Подтверждение</h1>
+    <p>Вы уверены, что хотите удалить товар "<strong>{{ product.title }}</strong>"?</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Да, удалить</button>
+    </form>
+    <a href="{% url 'eshop:product_detail' product.id %}">Отмена</a>
+{% endblock page_content %}
