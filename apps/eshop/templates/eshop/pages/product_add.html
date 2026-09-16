@@ -10,7 +10,13 @@
     <form method="POST" novalidate>
         {% csrf_token %}
 
-        {{ form.as_p }}    
+        {% for field in form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
 
         <button type="submit">Добавить</button>
     </form>
