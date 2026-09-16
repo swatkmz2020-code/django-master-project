@@ -11,5 +11,8 @@
     <h2>ID товара: {{ prroduct.id }}</h2>
     <h3>{{ product.title }}</h3>
     <p>{{ product.text }}</p>
+    <p>{{ product.price }}</p>
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
+
+    <a href="{% url 'eshop:product_edit' product_id=product.id %}">Редактировать</a>
 {% endblock page_content %}

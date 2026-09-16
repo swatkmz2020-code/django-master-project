@@ -28,3 +28,18 @@ def product_add_view(request):
 
             
         return render(request, 'eshop/pages/product_add.html', {"form": form})
+
+
+def product_edit_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=product)
+
+        if form.is_valid():
+            form.save()
+            return redirect("eshop:product_detail", product_id=product.pk)
+        return render(request, 'eshop/pages/product_edit.html', context={"form": form})
+
+    form = PostForm(instance=product)
+    return render(request, 'eshop/pages/product_edit.html', context={"form": form})
