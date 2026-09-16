@@ -27,11 +27,26 @@ def product_add_view(request):
                 return redirect('eshop:product_detail', product_id=product.pk)
 
             
-        return render(request, 'eshop/pages/product_add.html', {"form": form})
+        return render(
+                request,
+                'eshop/pages/product_form.html',
+                {
+                    "form": form,
+                    "title": "Добавить товар",
+                    "h1": "Новый товар",
+                    "submit_button_text": "Добавить",
+                }
+            )
 
 
 def product_edit_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
+    extra_context = {
+        "title": "Редактировать товар",
+        "h1": "Редактирование",
+        "submit_button_text": "Сохранить",
+    }
 
     if request.method == "POST":
         form = PostForm(request.POST, instance=product)
@@ -39,7 +54,21 @@ def product_edit_view(request, product_id):
         if form.is_valid():
             form.save()
             return redirect("eshop:product_detail", product_id=product.pk)
-        return render(request, 'eshop/pages/product_edit.html', context={"form": form})
+        return render(
+            request,
+            'eshop/pages/product_form.html',
+            context={
+                "form": form,
+                **extra_context,
+            }
+        )
 
     form = PostForm(instance=product)
-    return render(request, 'eshop/pages/product_edit.html', context={"form": form})
+    return render(
+        request,
+        'eshop/pages/product_form.html',
+        context={
+            "form": form,
+            **extra_context,
+        }
+    )
