@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from eshop.forms import PostForm
 from eshop.models import Product
@@ -72,3 +73,8 @@ def product_edit_view(request, product_id):
             **extra_context,
         }
     )
+
+@require_POST
+def product_remove_view(_, product_id):
+    get_object_or_404(Product, id=product_id).delete()
+    return redirect("eshop:product_list")
