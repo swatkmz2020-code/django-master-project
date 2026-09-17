@@ -8,13 +8,14 @@
     <a href="javascript:history.back()">&larr; Назад</a>
 
     <h1>Детали товара:</h1>
-    <h2>ID товара: {{ prroduct.id }}</h2>
+    <h2>ID товара: {{ product.id }}</h2>
     <h3>{{ product.title }}</h3>
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
 
-    <a href="{% url 'eshop:product_edit' product_id=product.id %}">Редактировать</a>
-    <a href="{% url 'eshop:product_remove' product_id=product.id %}">Удалить</a>
+    <a href="{% url 'eshop:product_edit' product.id %}">Редактировать</a>
+    <a href="{% url 'eshop:product_remove' product.id %}">Удалить</a>
+
 {% endblock page_content %}
 
