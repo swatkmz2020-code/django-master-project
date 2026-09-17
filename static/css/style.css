@@ -1,0 +1,36 @@
+/* Стили для контейнера товара */
+.product-container {
+    background-color: #1c524d;
+    color: white !important;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* Стили для текста внутри контейнера */
+.product-container p, 
+.product-container small,
+.product-container strong {
+    color: white;
+}
+
+/* Стили для ссылки-заголовка */
+.product-link {
+    color: #e0f2f1 !important;
+    text-decoration: none !important;
+}
+
+/* Стили для текста описания */
+.product-description {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Стили для цены */
+.product-price {
+    font-size: 1.25em;
+    color: #ffeb3b !important;
+    font-weight: bold;
+}
+
