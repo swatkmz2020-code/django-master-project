@@ -25,9 +25,8 @@
             <p class="product-description">
                 <strong>Описание товара:</strong> {{ product.text }}
             </p>
-            <p>
-                <strong>Цена:</strong>
-                <span class="product-price">{{ product.price }}</span> Р
+            <p class="product-price">
+                <strong>Цена:</strong> {{ product.price }} ₽
             </p>
             <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
         </div>
