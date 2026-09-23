@@ -26,13 +26,13 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:home_page' %}"><i class="bi bi-house"></i> Главная</a>
+                            <a class="nav-link" href="{% url 'eshop:home_page' %}">{% bs_icon 'house' extra_classes='me-1' %}Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:product_list' %}"><i class="bi bi-file-richtext"></i>Товары</a>
+                            <a class="nav-link" href="{% url 'eshop:product_list' %}">{% bs_icon 'file-richtext' extra_classes='me-1' %}Товары</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:product_add' %}"><i class="bi bi-plus-square-dotted"></i> Добавить товар</a>
+                            <a class="nav-link" href="{% url 'eshop:product_add' %}">{% bs_icon 'plus-square-dotted' extra_classes='me-1' %}Добавить товар</a>
                         </li>
                     </ul>
                 </div>
