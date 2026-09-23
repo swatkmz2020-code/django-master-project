@@ -1,21 +1,22 @@
 {% extends "eshop/base.html" %}
-{% load static %} <!-- Подгружаем работу со статикой Django -->
+{% load static %} 
 
 {% block page_title %}
     Gastronom | Все товары
 {% endblock page_title %}
 
-{% block page_content %}
-<!-- Подключаем созданные вами файлы стилей -->
-<link rel="stylesheet" href="{% static 'eshop/css/pages/base.css' %}">
-<link rel="stylesheet" href="{% static 'eshop/css/pages/style.css' %}">
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'eshop/css/pages/base.css' %}">
+    <link rel="stylesheet" href="{% static 'eshop/css/pages/style.css' %}">
+{% endblock styles %}
 
+
+{% block page_content %}
 <h1>Товары магазина Gastronom</h1>
 
 {# Отображение товаров из базы данных #}
 {% if products %}
     {% for product in products %}
-        <!-- Мы убрали длинный style="..." и заменили его на класс -->
         <div class="product-container">
             <h2>
                 <a href="{% url 'eshop:product_detail' product.id %}" class="product-link">
@@ -35,4 +36,5 @@
     <p>Товаров еще нет. Загляните позже!</p>
 {% endif %}
 {% endblock page_content %}
+
 
