@@ -1,8 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from eshop.forms import PostForm
 from eshop.models import Product
-
 
 def home_page_view(request):
     return render(request, template_name='eshop/pages/index.html')
@@ -18,6 +18,7 @@ def product_detail_view(request, product_id):
     return render(request, 'eshop/pages/product_detail.html', {'product': product})
 
 
+@login_required
 def product_add_view(request):
         form = PostForm(request.POST or None)
 
