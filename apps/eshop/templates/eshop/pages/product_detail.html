@@ -14,6 +14,8 @@
     <p>{{ product.price }}</p>
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
 
+    <p>Автор товара: {{ product.author }}</p>
+
     <a href="{% url 'eshop:product_edit' product.id %}">Редактировать</a>
     <a href="{% url 'eshop:product_remove' product.id %}">Удалить</a>
 
