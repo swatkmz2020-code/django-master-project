@@ -24,7 +24,9 @@ def product_add_view(request):
 
         if request.method == "POST":
             if form.is_valid():
-                product = form.save()
+                product = form.save(commit=False)
+                product.author = request.user
+                product.save()
                 return redirect('eshop:product_detail', product_id=product.pk)
 
             
