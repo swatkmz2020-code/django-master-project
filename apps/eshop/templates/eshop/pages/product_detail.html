@@ -6,18 +6,18 @@
 
 {% block page_content %}
     <a href="javascript:history.back()">&larr; Назад</a>
-
     <h1>Детали товара:</h1>
     <h2>ID товара: {{ product.id }}</h2>
     <h3>{{ product.title }}</h3>
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
-
     <p>Автор товара: {{ product.author }}</p>
 
-    <a href="{% url 'eshop:product_edit' product.id %}">Редактировать</a>
-    <a href="{% url 'eshop:product_remove' product.id %}">Удалить</a>
-
+    {% if request.user == product.author %}
+        <a href="{% url 'eshop:product_edit' product_id=product.id %}">Редактировать</a>
+        <a href="{% url 'eshop:product_remove' product_id=product.id %}">Удалить</a>
+    {% endif %}
 {% endblock page_content %}
+
 
