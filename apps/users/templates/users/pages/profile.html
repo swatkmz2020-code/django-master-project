@@ -1,0 +1,28 @@
+{% extends "eshop/base.html" %}
+
+{% block page_title %}
+    Gastronom | Профиль {{ user.username }}
+{% endblock page_title %}
+
+{% block page_content %}
+    <h1>Профиль пользователя: {{ user.username }}</h1>
+    <p>Имя: {% firstof user.first_name "Михаил" %}</p>
+    <p>Фамилия: {% firstof user.last_name "Святский" %}</p>
+    <p>Email: {% firstof user.email "swatkmz2020@gmail.com" %}</p>
+
+
+    <h2>Товары пользователя:</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{% url 'eshop:product_detail' product_id=product.id %}">
+                    {{ product.title }}
+                </a> 
+                — {{ product.price }} руб.
+            </li>
+        {% empty %}
+            <li>У этого пользователя пока нет товаров.</li>
+        {% endfor %}
+    </ul>
+{% endblock page_content %}
+

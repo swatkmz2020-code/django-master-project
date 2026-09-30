@@ -12,12 +12,23 @@
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
     <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
-    <p>Автор товара: {{ product.author }}</p>
+    <p>
+        Автор товара:
+        {% if product.author %}
+            <a href="{% url 'users:profile' username=product.author.username %}">
+                {{ product.author.username }}
+            </a>
+        {% else %}
+            <span>Автор не указан</span>
+        {% endif %}
+    </p>
 
-    {% if request.user == product.author %}
+    {% if request.user == product.author and product.author %}
         <a href="{% url 'eshop:product_edit' product_id=product.id %}">Редактировать</a>
         <a href="{% url 'eshop:product_remove' product_id=product.id %}">Удалить</a>
     {% endif %}
 {% endblock page_content %}
+
+
 
 

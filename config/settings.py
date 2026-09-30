@@ -144,4 +144,4 @@ MAILERS = {
 
 
 LOGIN_URL = 'users:login'
-DEFAULT_LOGIN_REDIRECT_URL = 'eshop:home_page'
+DEFAULT_LOGIN_REDIRECT_URL = 'users:profile'
