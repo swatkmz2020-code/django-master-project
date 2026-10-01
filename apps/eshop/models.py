@@ -7,6 +7,7 @@ User = get_user_model()
 
 class Product(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название")
+    image = models.ImageField(upload_to="eshop_images/", null=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Цена")

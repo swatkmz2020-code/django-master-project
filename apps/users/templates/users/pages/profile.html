@@ -1,4 +1,5 @@
 {% extends "eshop/base.html" %}
+{% load static %}
 
 {% block page_title %}
     Gastronom | Профиль {{ user.username }}
@@ -11,23 +12,33 @@
 
 {% block page_content %}
     <h1>Профиль пользователя: {{ user.username }}</h1>
-    <p>Имя: {% firstof user.first_name "Михаил" %}</p>
-    <p>Фамилия: {% firstof user.last_name "Святский" %}</p>
-    <p>Email: {% firstof user.email "swatkmz2020@gmail.com" %}</p>
+    <p>Имя: {{ user.first_name|default:"Не указано" }}</p>
+    <p>Фамилия: {{ user.last_name|default:"Не указано" }}</p>
+    <p>Email: {{ user.email|default:"Не указано" }}</p>
 
 
-    <h2>Товары пользователя:</h2>
-    <ul>
-        {% for product in products %}
-            <li>
-                <a href="{% url 'eshop:product_detail' product_id=product.id %}">
+
+<h2>Товары пользователя:</h2>
+<div class="products-list">
+    {% for product in products %}
+        <div class="product-container">
+            <h2>
+                <a href="{% url 'eshop:product_detail' product.id %}" class="product-link">
                     {{ product.title }}
-                </a> 
-                — {{ product.price }} руб.
-            </li>
-        {% empty %}
-            <li>У этого пользователя пока нет товаров.</li>
-        {% endfor %}
-    </ul>
+                </a>
+            </h2>
+            <p class="product-description">
+                <strong>Описание товара:</strong> {{ product.text }}
+            </p>
+            <p class="product-price">
+                <strong>Цена:</strong> {{ product.price }} ₽
+            </p>
+            <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
+        </div>
+    {% empty %}
+        <p>У этого пользователя пока нет товаров.</p>
+    {% endfor %}
+</div>
+
 {% endblock page_content %}
 
