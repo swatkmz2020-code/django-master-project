@@ -4,6 +4,11 @@
     Gastronom | Профиль {{ user.username }}
 {% endblock page_title %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'users/css/pages/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'eshop/css/includes/product_container.css' %}">
+{% endblock styles %}
+
 {% block page_content %}
     <h1>Профиль пользователя: {{ user.username }}</h1>
     <p>Имя: {% firstof user.first_name "Михаил" %}</p>

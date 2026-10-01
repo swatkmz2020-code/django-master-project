@@ -1,4 +1,3 @@
-/* Стили для контейнера товара */
 .product-container {
     background-color: #1c524d;
     color: white !important;
@@ -33,4 +32,3 @@
     color: #ffeb3b !important;
     font-weight: bold;
 }
-
