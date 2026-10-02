@@ -20,7 +20,7 @@ def product_detail_view(request, product_id):
 
 @login_required
 def product_add_view(request):
-        form = PostForm(request.POST or None)
+        form = PostForm(request.POST or None, request.FILES or None)
 
         if request.method == "POST":
             if form.is_valid():
@@ -55,7 +55,7 @@ def product_edit_view(request, product_id):
     }
 
     if request.method == "POST":
-        form = PostForm(request.POST, instance=product)
+        form = PostForm(request.POST, request.FILES, instance=product)
 
         if form.is_valid():
             form.save()
