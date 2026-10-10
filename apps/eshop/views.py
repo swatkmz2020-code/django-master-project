@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from eshop.forms import PostForm
@@ -9,12 +10,19 @@ def home_page_view(request):
 
 
 def product_list_view(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(status="published")
     return render(request, template_name='eshop/pages/product_list.html', context={'products': products})
 
 
 def product_detail_view(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+    # Товар доступен, если он опубликован или если текущий пользователь является его автором
+    if request.user.is_authenticated:
+        condition = Q(id=product_id) & (Q(status="published") | Q(author=request.user))
+    else:
+        condition = Q(id=product_id) & Q(status="published")
+
+    # product = Product.objects.get(condition)
+    product = get_object_or_404(Product, condition)
     return render(request, 'eshop/pages/product_detail.html', {'product': product})
 
 

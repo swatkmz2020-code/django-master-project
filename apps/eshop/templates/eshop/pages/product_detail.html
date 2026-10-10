@@ -10,6 +10,11 @@
     <h2>ID товара: {{ product.id }}</h2>
     <h3>{{ product.title }}</h3>
 
+    {% if request.user == product.author %}
+        {% comment %} Статус: {{ product.status }} {% endcomment %}
+        Статус: {{ product.get_status_display }}
+    {% endif %}
+
     {% if product.image %}
         <img src="{{ product.image.url }}" alt="{{ product.title }}" width="200" style="height: auto; border-radius: 8px;">
     {% endif %}

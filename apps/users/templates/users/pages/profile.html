@@ -19,26 +19,13 @@
 
 
 <h2>Товары пользователя:</h2>
-<div class="products-list">
     {% for product in products %}
-        <div class="product-container">
-            <h2>
-                <a href="{% url 'eshop:product_detail' product.id %}" class="product-link">
-                    {{ product.title }}
-                </a>
-            </h2>
-            <p class="product-description">
-                <strong>Описание товара:</strong> {{ product.text }}
-            </p>
-            <p class="product-price">
-                <strong>Цена:</strong> {{ product.price }} ₽
-            </p>
-            <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
-        </div>
+        {% if user == request.user or product.status != 'draft' %}
+            {% include 'eshop/includes/product_container.html' %}
+        {% endif %}
     {% empty %}
         <p>У этого пользователя пока нет товаров.</p>
     {% endfor %}
-</div>
 
 {% endblock page_content %}
 
