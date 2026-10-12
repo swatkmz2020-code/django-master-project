@@ -28,17 +28,26 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:home_page' %}">
+                            <a
+                                class="nav-link {% if request.resolver_match.url_name == 'home_page' %}active{% endif %}"
+                                href="{% url 'eshop:home_page' %}"
+                            >
                                 {% bs_icon 'house' extra_classes='me-1' %}Главная
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:product_list' %}">
+                            <a
+                                class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+                                href="{% url 'eshop:product_list' %}"
+                            >
                                 {% bs_icon 'file-richtext' extra_classes='me-1' %}Товары
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'eshop:product_add' %}">
+                            <a
+                                class="nav-link {% if request.resolver_match.url_name == 'product_add' %}active{% endif %}"
+                                href="{% url 'eshop:product_add' %}"
+                            >
                                 {% bs_icon 'plus-square-dotted' extra_classes='me-1' %}Добавить товар
                             </a>
                         </li>
@@ -46,7 +55,10 @@
                     <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
                         {% if request.user.is_authenticated %}
                             <li class="nav-item">
-                            <a class="nav-link" href="{% url "users:profile" username=request.user.username %}">
+                            <a
+                                class="nav-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == request.user.username %}active{% endif %}"
+                                href="{% url "users:profile" username=request.user.username %}"
+                            >
                                 {% bs_icon 'person' extra_classes='me-1' %}
                                 {{ request.user }}
                             </a>
@@ -60,12 +72,18 @@
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center" href="{% url 'users:login' %}">
+                                <a
+                                    class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
+                                    href="{% url 'users:login' %}"
+                            >
                                     {% bs_icon 'door-closed' extra_classes='me-1' %}Войти
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center" href="{% url 'users:register' %}">
+                                <a
+                                    class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}"
+                                    href="{% url 'users:register' %}"
+                                >
                                     {% bs_icon 'person-add' extra_classes='me-1' %}Регистрация
                                 </a>
                             </li>
