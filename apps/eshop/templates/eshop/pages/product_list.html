@@ -20,7 +20,7 @@
     {% for product in products %}
         <div class="product-container">
             <h2>
-                <a href="{% url 'eshop:product_detail' product.id %}" class="product-link">
+                <a href="{% url 'eshop:product_detail' product.slug %}" class="product-link">
                     {{ product.title }}
                 </a>
             </h2>

@@ -14,12 +14,12 @@ def product_list_view(request):
     return render(request, template_name='eshop/pages/product_list.html', context={'products': products})
 
 
-def product_detail_view(request, product_id):
+def product_detail_view(request, product_slug):
     # Товар доступен, если он опубликован или если текущий пользователь является его автором
     if request.user.is_authenticated:
-        condition = Q(id=product_id) & (Q(status="published") | Q(author=request.user))
+        condition = Q(slug=product_slug) & (Q(status="published") | Q(author=request.user))
     else:
-        condition = Q(id=product_id) & Q(status="published")
+        condition = Q(slug=product_slug) & Q(status="published")
 
     # product = Product.objects.get(condition)
     product = get_object_or_404(Product, condition)
@@ -35,7 +35,7 @@ def product_add_view(request):
                 product = form.save(commit=False)
                 product.author = request.user
                 product.save()
-                return redirect('eshop:product_detail', product_id=product.pk)
+                return redirect('eshop:product_detail', product_slug=product.slug)
 
             
         return render(
@@ -67,7 +67,7 @@ def product_edit_view(request, product_id):
 
         if form.is_valid():
             form.save()
-            return redirect("eshop:product_detail", product_id=product.pk)
+            return redirect("eshop:product_detail", product_slug=product.slug)
         return render(
             request,
             'eshop/pages/product_form.html',
