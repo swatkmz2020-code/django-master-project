@@ -5,7 +5,7 @@ from eshop.models import Product
 class PostForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['title', 'text', 'price', 'image']
+        fields = ['title', 'category', 'text', 'price', 'image']
         widgets = {
             'title': forms.TextInput(attrs={
                 'placeholder': "Максимальная длина 200 символов"
@@ -18,13 +18,18 @@ class PostForm(forms.ModelForm):
                 'placeholder': "0.00",
                 'step': "0.01"
             }),
+            'category': forms.Select(attrs={'class': 'form-control'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}) 
         }
         labels = {
         'title': 'Название товара:',
         'text': 'Описание товара:',
+        'category': 'Категория:',
         'price': 'Цена',
         'image': 'Картинка товара'
+        }
+        help_texts = {
+        'category': "- можно выбрать только одну категорию"
         }
 
 
