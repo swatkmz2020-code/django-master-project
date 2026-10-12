@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 from unidecode import unidecode
 
@@ -15,6 +16,14 @@ class Product(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="Название")
     slug = models.SlugField(unique=True, editable=False)
+    category = models.ForeignKey(
+        'Category',
+        related_name='products',
+        on_delete=models.CASCADE,
+        verbose_name="Категория",
+        null=True,
+        blank=True
+    )
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,6 +57,15 @@ class Category(models.Model):
         verbose_name = 'категория'
         verbose_name_plural = "категории"
         # db_table = "eshop_categories"
+
+    def get_absolute_url(self):
+        return reverse('eshop:category_products', kwargs={'category_slug': self.slug})
+
+    # def get_absolute_url(self):
+    #     # return f"/products/{self.slug}/"
+    #     # return reverse('eshop:product_detail', args=[self.slug])
+    #     return reverse('eshop:product_detail', kwargs={'product_slug': self.slug})
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
