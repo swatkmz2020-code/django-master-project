@@ -15,6 +15,9 @@
         Статус: {{ product.get_status_display }}
     {% endif %}
 
+    <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>
+
+
     {% if product.image %}
         <img src="{{ product.image.url }}" alt="{{ product.title }}" width="200" style="height: auto; border-radius: 8px;">
     {% endif %}

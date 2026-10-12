@@ -3,10 +3,24 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from eshop.forms import PostForm
-from eshop.models import Product
+from eshop.models import Category, Product
 
 def home_page_view(request):
     return render(request, template_name='eshop/pages/index.html')
+
+
+def category_products_view(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    products = Product.objects.filter(category=category, status='published')
+    # products = category.products.filter(status='published')
+
+    context = {
+        'category': category,
+        'products': products
+    }
+    return render(request, 'eshop/pages/category_products.html', context)
+
+
 
 
 def product_list_view(request):
