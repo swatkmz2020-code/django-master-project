@@ -1,6 +1,8 @@
 from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.text import slugify
+from unidecode import unidecode
 
 User = get_user_model()
 
@@ -12,6 +14,7 @@ class Product(models.Model):
     )
 
     title = models.CharField(max_length=200, verbose_name="Название")
+    slug = models.SlugField(unique=True, editable=False)
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,6 +30,12 @@ class Product(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
+
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(unidecode(self.title))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
