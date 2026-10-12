@@ -1,9 +1,10 @@
 <div class="product-container">
     <h2>
-        <a href="{% url 'eshop:product_detail' product_slug=product.slug %}" class="product-link">
+        <a href="{{ product.get_absolute_url }}" class="product-link">
             {{ product.title }}
         </a>
     </h2>
+    <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>{{ product.category }}</a></p>
     <p class="product-description">
         <strong>Описание товара:</strong> {{ product.text }}
     </p>
