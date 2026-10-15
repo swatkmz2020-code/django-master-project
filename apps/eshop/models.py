@@ -24,6 +24,13 @@ class Product(models.Model):
         null=True,
         blank=True
     )
+    country = models.CharField(
+        max_length=100,
+        verbose_name="Страна происхождения",
+        blank=True,
+        null=True
+    )
+
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -39,6 +46,11 @@ class Product(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
+
+    def get_absolute_url(self):
+            #     # return f"/products/{self.slug}/"
+            #     # return reverse('eshop:product_detail', args=[self.slug])
+        return reverse('eshop:product_detail', kwargs={'product_slug': self.slug})
 
 
     def save(self, *args, **kwargs):
@@ -62,8 +74,8 @@ class Category(models.Model):
         return reverse('eshop:category_products', kwargs={'category_slug': self.slug})
 
     # def get_absolute_url(self):
-    #     # return f"/products/{self.slug}/"
-    #     # return reverse('eshop:product_detail', args=[self.slug])
+    # #     # return f"/products/{self.slug}/"
+    # #     # return reverse('eshop:product_detail', args=[self.slug])
     #     return reverse('eshop:product_detail', kwargs={'product_slug': self.slug})
 
 
