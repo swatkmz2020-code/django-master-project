@@ -16,11 +16,15 @@
     {% endif %}
 
     <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>
-
+    
+    {% if product.country %}
+        <p>Страна происхождения: <strong>{{ product.country }}</strong></p>
+    {% endif %}
 
     {% if product.image %}
         <img src="{{ product.image.url }}" alt="{{ product.title }}" width="200" style="height: auto; border-radius: 8px;">
     {% endif %}
+
 
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>

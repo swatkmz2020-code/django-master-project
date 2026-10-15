@@ -4,9 +4,14 @@
             {{ product.title }}
         </a>
     </h2>
-    <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>{{ product.category }}</a></p>
-    <p class="product-description">
+    {% comment %} <p class="product-category">
+        <strong>Категория:</strong> {{ product.category }}
+    </p> {% endcomment %}
+    <p class="product-text">
         <strong>Описание товара:</strong> {{ product.text }}
+    </p>
+    <p class="product-country">
+        <strong>Страна происхождения:</strong> {{ product.country }}
     </p>
     <p class="product-price">
         <strong>Цена:</strong> {{ product.price }} ₽
