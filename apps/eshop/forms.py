@@ -3,9 +3,18 @@ from django import forms
 from eshop.models import Product
 
 class PostForm(forms.ModelForm):
+    tags_input = forms.CharField(
+    required=False,
+    widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Введите теги через запятую'
+    }),
+    label="Теги",
+    help_text="- можно указать несколько тегов",
+    )
     class Meta:
         model = Product
-        fields = ['title', 'category', 'text', 'tags', 'price', 'image']
+        fields = ['title', 'category', 'text', 'tags_input', 'price', 'image']
         widgets = {
             'title': forms.TextInput(attrs={
                 'placeholder': "Максимальная длина 200 символов"
@@ -20,7 +29,6 @@ class PostForm(forms.ModelForm):
             }),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}), 
-            'tags': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
         labels = {
         'title': 'Название товара:',
@@ -28,7 +36,6 @@ class PostForm(forms.ModelForm):
         'category': 'Категория:',
         'price': 'Цена',
         'image': 'Картинка товара',
-        'tags': 'Теги:',
         }
         help_texts = {
         'category': "- можно выбрать только одну категорию"
@@ -40,3 +47,15 @@ class PostForm(forms.ModelForm):
         if len(title) < 10:
             raise forms.ValidationError("Название не должно быть короче 10 символов.")
         return title
+    
+    def clean_tags_input(self):
+        # Если tags_input равен None, берем пустую строку ""
+        tags_data = self.cleaned_data.get('tags_input') or ""
+        
+        tag_names = [
+            tag_name.strip().lower()
+            for tag_name in tags_data.split(',')
+            if tag_name.strip()
+        ]
+        return tag_names
+
