@@ -21,16 +21,12 @@ class Product(models.Model):
         related_name='products',
         on_delete=models.CASCADE,
         verbose_name="Категория",
-        null=True,
-        blank=True
     )
     country = models.CharField(
-        max_length=100,
+        max_length=20,
         verbose_name="Страна происхождения",
-        blank=True,
-        null=True
     )
-
+    tags = models.ManyToManyField("Tag", related_name='products', blank=True, verbose_name='Теги')
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,8 +44,6 @@ class Product(models.Model):
         verbose_name_plural = 'Товары'
 
     def get_absolute_url(self):
-            #     # return f"/products/{self.slug}/"
-            #     # return reverse('eshop:product_detail', args=[self.slug])
         return reverse('eshop:product_detail', kwargs={'product_slug': self.slug})
 
 
@@ -73,11 +67,25 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('eshop:category_products', kwargs={'category_slug': self.slug})
 
-    # def get_absolute_url(self):
-    # #     # return f"/products/{self.slug}/"
-    # #     # return reverse('eshop:product_detail', args=[self.slug])
-    #     return reverse('eshop:product_detail', kwargs={'product_slug': self.slug})
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(unidecode(self.name))
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Название')
+    slug = models.SlugField(unique=True, editable=False)
+
+    class Meta:
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
+
+    def get_absolute_url(self):
+        return reverse('eshop:tag_products', kwargs={'tag_slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:

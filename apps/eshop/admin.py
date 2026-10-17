@@ -1,5 +1,6 @@
 from django.contrib import admin
-from eshop.models import Category, Product
+from .models import Category, Product, Tag
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -7,10 +8,22 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    # Оставляем slug в общем списке (здесь он разрешен)
-    list_display = ('title', 'price', 'category', 'country')
+    # 1. Добавляем 'get_tags' в список отображения таблицы
+    list_display = ('title', 'price', 'category', 'get_tags', 'country')
+    fields = ('title', 'category', 'country', 'text', 'tags', 'price', 'image', 'author')
+
+
+    # 2. Создаем метод, который склеит все теги товара через запятую
+    def get_tags(self, obj):
+        return ", ".join([t.name for t in obj.tags.all()])
     
-    # Удаляем 'slug' из списка редактируемых полей формы
-    fields = ('title', 'category', 'country', 'text', 'price', 'image', 'author')
+    # 3. Красивое название колонки для таблицы
+    get_tags.short_description = 'Теги'
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+        list_display = ('name', 'slug')
+
 
 
