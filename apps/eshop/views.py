@@ -10,22 +10,25 @@ class HomePageView(TemplateView):
     template_name = 'eshop/pages/index.html'
 
 
-class PostListView(ListView):
+class ProductListView(ListView):
     queryset = Product.objects.filter(status="published")
     context_object_name = 'products'
     template_name = 'eshop/pages/product_list.html'
 
 
-def category_products_view(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
-    products = Product.objects.filter(category=category, status='published')
-    # products = category.products.filter(status='published')
+class CategoryProductsView(ListView):
+    context_object_name = 'products'
+    template_name = 'eshop/pages/category_products.html'
 
-    context = {
-        'category': category,
-        'products': products
-    }
-    return render(request, 'eshop/pages/category_products.html', context)
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        return Product.objects.filter(category=self.category, status='published')
+        # return self.category.products.filter(status='published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
 
 
 def tag_products_view(request, tag_slug):
