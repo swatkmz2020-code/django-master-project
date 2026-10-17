@@ -31,16 +31,19 @@ class CategoryProductsView(ListView):
         return context
 
 
-def tag_products_view(request, tag_slug):
-    tag = get_object_or_404(Tag, slug=tag_slug)
-    products = Product.objects.filter(tags=tag, status='published')
-    # products = tag.products.filter(status='published')
+class TagProductsView(ListView):
+    context_object_name = 'products'
+    template_name = 'eshop/pages/tag_products.html'
 
-    context = {
-        'tag': tag,
-        'products': products
-    }
-    return render(request, 'eshop/pages/tag_products.html', context)
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Product.objects.filter(tags=self.tag, status='published')
+        # return self.tag.products.filter(status='published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
 
 
 def product_detail_view(request, product_slug):
