@@ -4,9 +4,15 @@
             {{ product.title }}
         </a>
     </h2>
-    {% comment %} <p class="product-category">
-        <strong>Категория:</strong> {{ product.category }}
-    </p> {% endcomment %}
+    <p>
+        Теги:
+        {% for tag in product.tags.all %}
+            <a href="{{ tag.get_absolute_url }}" class="product-link">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            нет тегов
+        {% endfor %}
+    </p>
+
     <p class="product-text">
         <strong>Описание товара:</strong> {{ product.text }}
     </p>
