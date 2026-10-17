@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import  ListView, TemplateView
+from django.views.generic import  DetailView, ListView, TemplateView
 
 from eshop.forms import PostForm
 from eshop.models import Category, Product, Tag
@@ -46,16 +46,20 @@ class TagProductsView(ListView):
         return context
 
 
-def product_detail_view(request, product_slug):
-    # Товар доступен, если он опубликован или если текущий пользователь является его автором
-    if request.user.is_authenticated:
-        condition = Q(slug=product_slug) & (Q(status="published") | Q(author=request.user))
-    else:
-        condition = Q(slug=product_slug) & Q(status="published")
+class ProductDetailView(DetailView):
+    # model = Product # Необязательно
+    slug_url_kwarg = 'product_slug'
+    template_name = 'eshop/pages/product_detail.html'
+    # context_object_name = 'product' # Необязательно
+    # slug_field = 'slug' # Необязательно
 
-    # product = Product.objects.get(condition)
-    product = get_object_or_404(Product, condition)
-    return render(request, 'eshop/pages/product_detail.html', {'product': product})
+    def get_queryset(self):
+        # Товар доступен, если он опубликован или если текущий пользователь является его автором
+        if self.request.user.is_authenticated:
+            return Product.objects.filter(
+                Q(status="published") | Q(author=self.request.user)
+            )
+        return Product.objects.filter(status="published")
 
 
 @login_required
