@@ -4,6 +4,7 @@
             {{ product.title }}
         </a>
     </h2>
+    <p>Категория: <a href="{{ product.category.get_absolute_url }}" class="product-link">{{ product.category }}</a></p>
     <p>
         Теги:
         {% for tag in product.tags.all %}
