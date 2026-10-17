@@ -38,7 +38,8 @@
 
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
-    <p>{{ product.created_at|date:"d.m.Y H:i" }}</p>
+    <p>Дата создания товара: {{ product.created_at|date:"d.m.Y H:i" }}</p>
+    <p>Дата последнего изменения товара: {{ product.updated_at|date:"d.m.Y H:i" }}</p>
     <p>
         Автор товара:
         {% if product.author %}
