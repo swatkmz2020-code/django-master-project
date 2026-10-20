@@ -21,7 +21,7 @@ class Product(models.Model):
         related_name='products',
         on_delete=models.CASCADE,
         verbose_name="Категория",
-        null=True,
+        # null=True,
         blank=True
     )
     country = models.CharField(
@@ -30,7 +30,6 @@ class Product(models.Model):
         blank=True,
         null=True
     )
-
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -86,3 +85,24 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Название')
+    slug = models.SlugField(max_length=50, unique=True, editable=False)
+
+    class Meta:
+        verbose_name = "тег"
+        verbose_name_plural = "теги"
+        # db_table = "eshop_tags"
+
+    def get_absolute_url(self):
+        return reverse('eshop:tag_products', kwargs={'tag_slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(unidecode(self.name))
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'#{self.name}'
