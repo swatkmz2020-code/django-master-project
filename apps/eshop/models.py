@@ -13,7 +13,6 @@ class Product(models.Model):
         ('published', 'Опубликован'),
         ('draft', 'Черновик')
     )
-
     title = models.CharField(max_length=200, verbose_name="Название")
     slug = models.SlugField(unique=True, editable=False)
     category = models.ForeignKey(
@@ -22,7 +21,7 @@ class Product(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Категория",
         # null=True,
-        blank=True
+        # blank=True
     )
     country = models.CharField(
         max_length=100,
@@ -30,6 +29,7 @@ class Product(models.Model):
         blank=True,
         null=True
     )
+    tags = models.ManyToManyField("Tag", related_name='products', blank=True, verbose_name='Теги')
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
