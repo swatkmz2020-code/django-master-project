@@ -39,13 +39,6 @@ def tag_products_view(request, tag_slug):
     return render(request, 'eshop/pages/tag_products.html', context)
 
 
-
-
-
-
-
-
-
 def product_detail_view(request, product_slug):
     # Товар доступен, если он опубликован или если текущий пользователь является его автором
     if request.user.is_authenticated:
@@ -67,8 +60,16 @@ def product_add_view(request):
                 product = form.save(commit=False)
                 product.author = request.user
                 product.save()
-                form.save_m2m()
-                return redirect('eshop:product_detail', product_slug=product.slug)
+                
+                # Эти строки теперь стоят ровно под product.save()
+                tag_names = form.cleaned_data.get('tags_input') or []
+                
+                for tag_name in tag_names:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    product.tags.add(tag)
+                
+            return redirect('eshop:product_detail', product_slug=product.slug)
+
 
             
         return render(
@@ -100,6 +101,14 @@ def product_edit_view(request, product_id):
 
         if form.is_valid():
             form.save()
+
+
+            product.tags.clear()
+            tag_names = form.cleaned_data.get('tags_input') or []
+            for tag_name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=tag_name)
+                product.tags.add(tag)
+
             return redirect("eshop:product_detail", product_slug=product.slug)
         return render(
             request,
@@ -110,7 +119,9 @@ def product_edit_view(request, product_id):
             }
         )
 
-    form = ProductForm(instance=product)
+    existing_tags = ", ".join(tag.name for tag in product.tags.all())
+    form = ProductForm(instance=product, initial={'tags_input': existing_tags})
+    
     return render(
         request,
         'eshop/pages/product_form.html',
