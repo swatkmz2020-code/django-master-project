@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from eshop.forms import PostForm
+from eshop.forms import ProductForm
 from eshop.models import Category, Product
 
 def home_page_view(request):
@@ -42,13 +42,14 @@ def product_detail_view(request, product_slug):
 
 @login_required
 def product_add_view(request):
-        form = PostForm(request.POST or None, request.FILES or None)
+        form = ProductForm(request.POST or None, request.FILES or None)
 
         if request.method == "POST":
             if form.is_valid():
                 product = form.save(commit=False)
                 product.author = request.user
                 product.save()
+                form.save_m2m()
                 return redirect('eshop:product_detail', product_slug=product.slug)
 
             
@@ -77,7 +78,7 @@ def product_edit_view(request, product_id):
     }
 
     if request.method == "POST":
-        form = PostForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
 
         if form.is_valid():
             form.save()
@@ -91,7 +92,7 @@ def product_edit_view(request, product_id):
             }
         )
 
-    form = PostForm(instance=product)
+    form = ProductForm(instance=product)
     return render(
         request,
         'eshop/pages/product_form.html',
