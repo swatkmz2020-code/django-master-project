@@ -73,15 +73,20 @@ class ProductDetailView(DetailView):
     def get_object(self, queryset=None):
         product: Product = super().get_object(queryset)  # type: ignore
         # Явно задаем тип Product
-        
+
+        user = self.request.user
         # Используем slug вместо id для уникального ключа просмотра в сессии
         session_key = f'product_{product.slug}_viewed'
         
-        if not self.request.session.get(session_key, False) and product.author != self.request.user:
+        if not self.request.session.get(session_key, False) and product.author != user:
             # Обновляем просмотры в базе данных по id (так как id у объекта все равно есть)
             Product.objects.filter(id=product.id).update(views=F("views") + 1)  # type: ignore
             product.views += 1
             self.request.session[session_key] = True
+
+        if user.is_authenticated and user != product.author:
+            product.viewed_by_users.add(user) # Дубликатов записей не будет
+
             
         return product
 

@@ -4,6 +4,13 @@
             {{ product.title }}
         </a>
     </h2>
+
+    {% if request.user in product.viewed_by_users.all %}
+    <div class="badge bg-primary">
+        Просмотрено
+    </div>
+    {% endif %}
+
     <p>Категория: <a href="{{ product.category.get_absolute_url }}"class="product-link">{{ product.category }}</a></p>
     <p>
         Теги:
