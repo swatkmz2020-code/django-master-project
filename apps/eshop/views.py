@@ -1,7 +1,7 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
 from eshop.forms import ProductForm
 from eshop.models import Category, Product, Tag
@@ -63,37 +63,29 @@ class ProductDetailView(DetailView):
         return Product.objects.filter(status="published")
 
 
-@login_required
-def product_add_view(request):
-        form = ProductForm(request.POST or None, request.FILES or None)
+class ProductAddView(LoginRequiredMixin, CreateView):
+    form_class = ProductForm
+    extra_context = {
+        "title": "Добавить товар",
+        "h1": "Новый товар",
+        "submit_button_text": "Добавить"
+    }
+    template_name = 'eshop/pages/product_form.html'
 
-        if request.method == "POST":
-            if form.is_valid():
-                product = form.save(commit=False)
-                product.author = request.user
-                product.save()
+    def form_valid(self, form):
+        product = form.save(commit=False)
+        product.author = self.request.user
+        product.save()
                 
-                # Эти строки теперь стоят ровно под product.save()
-                tag_names = form.cleaned_data.get('tags_input') or []
+        tag_names = form.cleaned_data.get('tags_input') or []
                 
-                for tag_name in tag_names:
-                    tag, _ = Tag.objects.get_or_create(name=tag_name)
-                    product.tags.add(tag)
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            product.tags.add(tag)
                 
             return redirect('eshop:product_detail', product_slug=product.slug)
 
-
-            
-        return render(
-                request,
-                'eshop/pages/product_form.html',
-                {
-                    "form": form,
-                    "title": "Добавить товар",
-                    "h1": "Новый товар",
-                    "submit_button_text": "Добавить",
-                }
-            )
+        return redirect('eshop:product_detail', product_slug=product.slug)
 
 
 def product_edit_view(request, product_slug):
