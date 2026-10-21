@@ -153,7 +153,8 @@ class ProductRemoveView(DeleteView):
     model = Product
     pk_url_kwarg = 'product_slug'
     template_name = 'eshop/pages/product_remove_confirm.html'
-    
+    paginate_by = 3
+
     # context_object_name = 'product' # Необязательно
     success_url = reverse_lazy('eshop:product_list')
 
