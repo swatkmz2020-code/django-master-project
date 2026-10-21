@@ -4,11 +4,11 @@
             {{ product.title }}
         </a>
     </h2>
-    <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>
+    <p>Категория: <a href="{{ product.category.get_absolute_url }}"class="product-link">{{ product.category }}</a></p>
     <p>
         Теги:
         {% for tag in product.tags.all %}
-            <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{{ tag.get_absolute_url }}"class="product-link">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
         {% empty %}
             нет тегов
         {% endfor %}
@@ -23,6 +23,6 @@
     <p class="product-price">
         <strong>Цена:</strong> {{ product.price }} ₽
     </p>
-    <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
+    <small>Дата добавления товара: <span class="date-field">{{ pproduct.created_at|date:"c" }}</span></small>
 </div>
 

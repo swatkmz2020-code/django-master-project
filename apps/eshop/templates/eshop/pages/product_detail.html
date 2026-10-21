@@ -38,8 +38,8 @@
 
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
-    <p>Дата создания товара: {{ product.created_at|date:"d.m.Y H:i" }}</p>
-    <p>Дата последнего изменения товара: {{ product.updated_at|date:"d.m.Y H:i" }}</p>
+    <p>Дата добавления товара: <span class="date-field">{{ product.created_at|date:"c" }}</span></p>
+    <p>Дата последнего изменения товара: <span class="date-field">{{ product.updated_at|date:"c" }}</span></p>
     <p>
         Автор товара:
         {% if product.author %}
