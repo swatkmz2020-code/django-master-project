@@ -84,8 +84,8 @@ def product_add_view(request):
             )
 
 
-def product_edit_view(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def product_edit_view(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
 
     if request.user != product.author:
         return render(request, 'eshop/pages/not_allowed.html')
@@ -131,8 +131,8 @@ def product_edit_view(request, product_id):
         }
     )
 
-def product_remove_view(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def product_remove_view(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
 
     if request.user != product.author:
         return render(request, 'eshop/pages/not_allowed.html')
