@@ -31,6 +31,7 @@ class Product(models.Model):
     )
     tags = models.ManyToManyField("Tag", related_name='products', blank=True, verbose_name='Теги')
     image = models.ImageField(upload_to="eshop_images/", null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
     text = models.TextField(verbose_name="Описание")
     created_at = models.DateTimeField(auto_now_add=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Цена")
