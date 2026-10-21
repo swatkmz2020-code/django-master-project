@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from eshop.forms import ProductForm
 from eshop.models import Category, Product, Tag
@@ -32,28 +32,35 @@ class CategoryProductsView(ListView):
         return context
 
 
-def tag_products_view(request, tag_slug):
-    tag = get_object_or_404(Tag, slug=tag_slug)
-    products = Product.objects.filter(tags=tag, status='published')
-    # products = tag.products.filter(status='published')
+class TagProductsView(ListView):
+    context_object_name = 'products'
+    template_name = 'eshop/pages/tag_products.html'
 
-    context = {
-        'tag': tag,
-        'products': products
-    }
-    return render(request, 'eshop/pages/tag_products.html', context)
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Product.objects.filter(tags=self.tag, status='published')
+        # return self.tag.products.filter(status='published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
 
 
-def product_detail_view(request, product_slug):
-    # Товар доступен, если он опубликован или если текущий пользователь является его автором
-    if request.user.is_authenticated:
-        condition = Q(slug=product_slug) & (Q(status="published") | Q(author=request.user))
-    else:
-        condition = Q(slug=product_slug) & Q(status="published")
+class ProductDetailView(DetailView):
+    # model = Product # Необязательно
+    slug_url_kwarg = 'product_slug'
+    template_name = 'eshop/pages/product_detail.html'
+    # context_object_name = 'product' # Необязательно
+    # slug_field = 'slug' # Необязательно
 
-    # product = Product.objects.get(condition)
-    product = get_object_or_404(Product, condition)
-    return render(request, 'eshop/pages/product_detail.html', {'product': product})
+    def get_queryset(self):
+        # Товар доступен, если он опубликован или если текущий пользователь является его автором
+        if self.request.user.is_authenticated:
+            return Product.objects.filter(
+                Q(status="published") | Q(author=self.request.user)
+            )
+        return Product.objects.filter(status="published")
 
 
 @login_required
