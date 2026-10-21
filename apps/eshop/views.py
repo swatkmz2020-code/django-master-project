@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
+    DeleteView,
     DetailView,
     ListView,
     TemplateView,
@@ -102,7 +104,7 @@ class ProductEditView(UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         # Добавляем ignore в конец строки 105
-        self.object = self.get_object()  # type: ignore
+        self.object = self.get_object() # type: ignore
         
         # Добавляем ignore в конец строки 109
         if request.user != self.object.author:  # type: ignore
@@ -127,24 +129,38 @@ class ProductEditView(UpdateView):
         product = form.save()
         product.tags.clear()
         
+        # Получаем данные из поля формы
         raw_tags = form.cleaned_data.get('tags_input') or ''
-        tag_names = [t.strip() for t in raw_tags.split(',') if t.strip()]
         
+        # Если это строка — делим её по запятым, если уже список — оставляем как есть
+        if isinstance(raw_tags, str):
+            tag_names = [t.strip() for t in raw_tags.split(',') if t.strip()]
+        else:
+            tag_names = raw_tags  # Если Django уже вернул список/QuerySet тегов
+            
         for tag_name in tag_names:
-            tag, _ = Tag.objects.get_or_create(name=tag_name)
-            product.tags.add(tag)
+            # Если в списке лежат объекты Tag, берем их имя, иначе саму строку
+            name = tag_name.name if hasattr(tag_name, 'name') else str(tag_name).strip() # type: ignore
+            if name:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                product.tags.add(tag)
             
         return super().form_valid(form)
 
 
-def product_remove_view(request, product_slug):
-    product = get_object_or_404(Product, slug=product_slug)
 
-    if request.user != product.author:
-        return render(request, 'eshop/pages/not_allowed.html')
+class ProductRemoveView(DeleteView):
+    model = Product
+    pk_url_kwarg = 'product_slug'
+    template_name = 'eshop/pages/product_remove_confirm.html'
+    
+    # context_object_name = 'product' # Необязательно
+    success_url = reverse_lazy('eshop:product_list')
 
-    if request.method == "POST":
-        product.delete()
-        return redirect("eshop:product_list")
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object() # type: ignore
 
-    return render(request, 'eshop/pages/product_remove_confirm.html', {'product': product})
+        if request.user != self.object.author: # type: ignore
+                return render(request, 'eshop/pages/not_allowed.html')
+
+        return super().dispatch(request, *args, **kwargs)
