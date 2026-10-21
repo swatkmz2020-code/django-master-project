@@ -42,6 +42,11 @@ class Product(models.Model):
     )
     status = models.CharField(choices=STATUS_CHOICES, default='published', verbose_name="Статус")
     views = models.PositiveIntegerField(default=0, verbose_name="Просмотры")
+    viewed_by_users = models.ManyToManyField(
+        User, related_name='viewed_products',
+        blank=True,
+        verbose_name="Просмотрено пользователями"
+    )
 
     class Meta:
         ordering = ['-created_at']
