@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic import TemplateView
 
 from eshop.forms import ProductForm
 from eshop.models import Category, Product, Tag
 
 
-def home_page_view(request):
-    return render(request, template_name='eshop/pages/index.html')
+class HomePageView(TemplateView):
+    template_name = 'eshop/pages/index.html'
 
 
 def product_list_view(request):
