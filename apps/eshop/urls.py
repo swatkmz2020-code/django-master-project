@@ -5,7 +5,7 @@ app_name = "eshop"
 
 urlpatterns = [
     path('', views.HomePageView.as_view(), name="home_page"),
-    path('products/', views.product_list_view, name="product_list"),
+    path('products/', views.ProductListView.as_view(), name="product_list"),
     path('products/category/<slug:category_slug>/', views.category_products_view, name="category_products"),
     path('products/tag/<slug:tag_slug>/', views.tag_products_view, name="tag_products"),
     path('products/add/', views.product_add_view, name='product_add'),

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
 
 from eshop.forms import ProductForm
 from eshop.models import Category, Product, Tag
@@ -11,9 +11,10 @@ class HomePageView(TemplateView):
     template_name = 'eshop/pages/index.html'
 
 
-def product_list_view(request):
-    products = Product.objects.filter(status="published")
-    return render(request, template_name='eshop/pages/product_list.html', context={'products': products})
+class ProductListView(ListView):
+    queryset = Product.objects.filter(status="published")
+    context_object_name = 'products'
+    template_name = 'eshop/pages/product_list.html'
 
 
 def category_products_view(request, category_slug):
