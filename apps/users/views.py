@@ -1,6 +1,7 @@
 from django.conf import settings
-from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth import logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.views import LoginView as AuthLoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
@@ -16,20 +17,17 @@ class RegisterView(CreateView):
 
 
 
-def login_view(request):
-    form = AuthenticationForm(data=request.POST or None)
+class LoginView(AuthLoginView):
+    template_name = 'users/pages/login.html'
+    authentication_form = AuthenticationForm
 
-    if request.method == "POST":
-        if form.is_valid():
-            login(request, form.get_user())
-            next_url = request.GET.get('next', settings.DEFAULT_LOGIN_REDIRECT_URL) # В next будет '/product/add/', например.
+    def get_success_url(self):
+        next_url = self.request.GET.get('next', settings.DEFAULT_LOGIN_REDIRECT_URL)
 
-            if next_url == settings.DEFAULT_LOGIN_REDIRECT_URL:
-                return redirect(next_url, request.user.username)
+        if next_url == settings.DEFAULT_LOGIN_REDIRECT_URL:
+            return reverse_lazy(next_url, kwargs={'username': self.request.user.username})
 
-            return redirect(next_url)
-
-    return render(request, 'users/pages/login.html', {'form': form})
+        return next_url
 
 
 @require_POST
