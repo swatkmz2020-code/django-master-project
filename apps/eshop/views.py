@@ -1,7 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView
+)
 
 from eshop.forms import ProductForm
 from eshop.models import Category, Product, Tag
@@ -88,52 +94,48 @@ class ProductAddView(LoginRequiredMixin, CreateView):
         return redirect('eshop:product_detail', product_slug=product.slug)
 
 
-def product_edit_view(request, product_slug):
-    product = get_object_or_404(Product, slug=product_slug)
+class ProductEditView(UpdateView):
+    model = Product
+    slug_url_kwarg = 'product_slug'
+    form_class = ProductForm
+    template_name = 'eshop/pages/product_form.html'
 
-    if request.user != product.author:
-        return render(request, 'eshop/pages/not_allowed.html')
+    def dispatch(self, request, *args, **kwargs):
+        # Добавляем ignore в конец строки 105
+        self.object = self.get_object()  # type: ignore
+        
+        # Добавляем ignore в конец строки 109
+        if request.user != self.object.author:  # type: ignore
+            return render(request, 'eshop/pages/not_allowed.html')
+            
+        return super().dispatch(request, *args, **kwargs)
 
-    extra_context = {
-        "title": "Редактировать товар",
-        "h1": "Редактирование",
-        "submit_button_text": "Сохранить",
-    }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        context['title'] = "Редактировать товар"
+        context['h1'] = "Редактирование"
+        context['submit_button_text'] = "Сохранить"
+        
+        # Добавляем ignore в конец строки 120
+        context['form'].fields['tags_input'].initial = ", ".join(tag.name for tag in self.object.tags.all())  # type: ignore
+        
+        return context
 
-    if request.method == "POST":
-        form = ProductForm(request.POST, request.FILES, instance=product)
 
-        if form.is_valid():
-            form.save()
+    def form_valid(self, form):
+        product = form.save()
+        product.tags.clear()
+        
+        raw_tags = form.cleaned_data.get('tags_input') or ''
+        tag_names = [t.strip() for t in raw_tags.split(',') if t.strip()]
+        
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            product.tags.add(tag)
+            
+        return super().form_valid(form)
 
-
-            product.tags.clear()
-            tag_names = form.cleaned_data.get('tags_input') or []
-            for tag_name in tag_names:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                product.tags.add(tag)
-
-            return redirect("eshop:product_detail", product_slug=product.slug)
-        return render(
-            request,
-            'eshop/pages/product_form.html',
-            context={
-                "form": form,
-                **extra_context,
-            }
-        )
-
-    existing_tags = ", ".join(tag.name for tag in product.tags.all())
-    form = ProductForm(instance=product, initial={'tags_input': existing_tags})
-    
-    return render(
-        request,
-        'eshop/pages/product_form.html',
-        context={
-            "form": form,
-            **extra_context,
-        }
-    )
 
 def product_remove_view(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
