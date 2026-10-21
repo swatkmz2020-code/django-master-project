@@ -1,10 +1,9 @@
 from django.conf import settings
-from django.contrib.auth import logout, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.views import LoginView as AuthLoginView
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.decorators.http import require_POST
 from django.views.generic import CreateView
 
 User = get_user_model()
@@ -30,10 +29,8 @@ class LoginView(AuthLoginView):
         return next_url
 
 
-@require_POST
-def logout_view(request):
-    logout(request)
-    return redirect("eshop:home_page")
+class LogoutView(AuthLogoutView):
+    next_page = reverse_lazy('eshop:home_page')
 
 
 
