@@ -1,4 +1,5 @@
 {% extends "eshop/base.html" %}
+{% load bootstrap_icons %}
 
 {% block page_title %}
     Gastronom | {{ product.title }}
@@ -46,6 +47,7 @@
             <a href="{% url 'users:profile' username=product.author.username %}">
                 {{ product.author.username }}
             </a>
+            {% bs_icon 'eye' extra_classes='me-1' %}{{ product.views }}
         {% else %}
             <span>Автор не указан</span>
         {% endif %}
