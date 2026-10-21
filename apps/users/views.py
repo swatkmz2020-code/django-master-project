@@ -2,9 +2,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
-from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 
 User = get_user_model()
 
@@ -34,14 +33,22 @@ class LogoutView(AuthLogoutView):
 
 
 
-def profile_view(request, username):
-    user = get_object_or_404(User, username=username)
-    # product = Product.objects.filter(author=user) # .order_by('-created_at')
-    products = user.products.all()  # type: ignore
+class ProfileView(DetailView):
+    model = User
+    slug_url_kwarg = 'username'
+    slug_field = 'username'
+    template_name = 'users/pages/profile.html'
+    # context_object_name = 'user' # Необязательно
 
 
-    context = {
-    'user': user,
-    'products': products
-    }
-    return render(request, 'users/pages/profile.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Просто добавляем комментарий в конец строки
+        context['products'] = self.object.products.all()  # type: ignore
+        
+        return context
+
+
+
+
