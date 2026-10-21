@@ -41,6 +41,7 @@ class Product(models.Model):
         related_name='products'
     )
     status = models.CharField(choices=STATUS_CHOICES, default='published', verbose_name="Статус")
+    views = models.PositiveIntegerField(default=0, verbose_name="Просмотры")
 
     class Meta:
         ordering = ['-created_at']
