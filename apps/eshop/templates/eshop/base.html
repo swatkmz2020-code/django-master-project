@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block page_title %}{% endblock page_title %}</title>
-    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <link class="icon" href="{% static 'images/favicon.ico' %}">
     {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'eshop/css/pages/base.css' %}">
     <link rel="stylesheet" href="{% static 'eshop/css/pages/scroll-to-top.css' %}">
@@ -32,7 +32,12 @@
                                 class="nav-link {% if request.resolver_match.url_name == 'home_page' %}active{% endif %}"
                                 href="{% url 'eshop:home_page' %}"
                             >
-                                {% bs_icon 'house' extra_classes='me-1' %}Главная
+                                {% if request.resolver_match.url_name == 'home_page' %}
+                                    {% bs_icon 'house-fill' extra_classes='me-1' %}
+                                {% else %}
+                                    {% bs_icon 'house' extra_classes='me-1' %}
+                                {% endif %}
+                                Главная
                             </a>
                         </li>
                         <li class="nav-item">
@@ -40,7 +45,12 @@
                                 class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
                                 href="{% url 'eshop:product_list' %}"
                             >
-                                {% bs_icon 'file-richtext' extra_classes='me-1' %}Товары
+                                {% if request.resolver_match.url_name == 'product_list' %}
+                                    {% bs_icon 'file-richtext-fill' extra_classes='me-1' %}
+                                {% else %}
+                                    {% bs_icon 'file-richtext' extra_classes='me-1' %}
+                                {% endif %}
+                                Товары
                             </a>
                         </li>
                         <li class="nav-item">
@@ -48,20 +58,30 @@
                                 class="nav-link {% if request.resolver_match.url_name == 'product_add' %}active{% endif %}"
                                 href="{% url 'eshop:product_add' %}"
                             >
-                                {% bs_icon 'plus-square-dotted' extra_classes='me-1' %}Добавить товар
+                                {% if request.resolver_match.url_name == 'product_add' %}
+                                    {% bs_icon 'plus-square-fill' extra_classes='me-1' %}
+                                {% else %}
+                                    {% bs_icon 'plus-square-dotted' extra_classes='me-1' %}
+                                {% endif %}
+                                Добавить товар
                             </a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
                         {% if request.user.is_authenticated %}
                             <li class="nav-item">
-                            <a
-                                class="nav-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == request.user.username %}active{% endif %}"
-                                href="{% url "users:profile" username=request.user.username %}"
-                            >
-                                {% bs_icon 'person' extra_classes='me-1' %}
-                                {{ request.user }}
-                            </a>
+                                <a
+                                    class="nav-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == request.user.username %}active{% endif %}"
+                                    href="{% url "users:profile" username=request.user.username %}"
+                                >
+                                    {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == request.user.username %}
+                                        {% bs_icon 'person-fill' extra_classes='me-1' %}
+                                    {% else %}
+                                        {% bs_icon 'person' extra_classes='me-1' %}
+                                    {% endif %}
+                                    {{ request.user }}
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <form class="m-0 p-0 d-flex align-items-center" method="POST" action="{% url 'users:logout' %}">
                                     {% csrf_token %}
@@ -75,8 +95,12 @@
                                 <a
                                     class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
                                     href="{% url 'users:login' %}"
-                            >
-                                    {% bs_icon 'door-closed' extra_classes='me-1' %}Войти
+                                >
+                                    {% if request.resolver_match.url_name == 'login' %}
+                                        {% bs_icon 'door-open-fill' extra_classes='me-1' %}
+                                    {% else %}
+                                        {% bs_icon 'door-closed' extra_classes='me-1' %}
+                                    {% endif %}Войти
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -84,7 +108,11 @@
                                     class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}"
                                     href="{% url 'users:register' %}"
                                 >
-                                    {% bs_icon 'person-add' extra_classes='me-1' %}Регистрация
+                                    {% if request.resolver_match.url_name == 'register' %}
+                                        {% bs_icon 'person-fill-add' extra_classes='me-1' %}
+                                    {% else %}
+                                        {% bs_icon 'person-add' extra_classes='me-1' %}
+                                    {% endif %}Регистрация
                                 </a>
                             </li>
                         {% endif %}
@@ -106,6 +134,5 @@
     {% bootstrap_javascript %}
 </body>
 </html>
-
 
 
