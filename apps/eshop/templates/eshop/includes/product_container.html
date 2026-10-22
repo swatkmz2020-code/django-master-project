@@ -1,9 +1,18 @@
+{% load bootstrap_icons %}
+
 <div class="product-container">
     <h2>
         <a href="{{ product.get_absolute_url }}" class="product-link">
             {{ product.title }}
         </a>
     </h2>
+
+    {% if request.user == product.author and request.resolver_match.url_name != 'profile' %}
+        <span class="badge bg-primary bg-opacity-10 border border-primary border-opacity-25">
+            {% bs_icon 'person-fill' extra_classes='me-1' %}
+            Мой товар
+        </span>
+    {% endif %}
 
     {% if request.user in product.viewed_by_users.all %}
     <div class="badge bg-primary">
