@@ -54,6 +54,29 @@ class TagProductsView(ListView):
         context['tag'] = self.tag
         return context
 
+class ProductsSearchView(ListView):
+    template_name = "eshop/pages/products_search.html"
+    context_object_name = 'products'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_performed'] = any(self.request.GET.keys())
+        return context
+
+    def get_queryset(self):
+        search_query = self.request.GET.get("q")
+        if search_query:
+            queryset = Product.objects.filter(status="published") # .order_by("-created_at")
+            condition = Q(title__icontains=search_query) | Q(text__icontains=search_query)
+            search_in_categories = self.request.GET.get("in_categories") == 'on'
+            search_in_tags = self.request.GET.get("in_tags") == 'on'
+            if search_in_categories:
+                condition |= Q(category__name__icontains=search_query)
+            if search_in_tags:
+                condition |= Q(tags__name__icontains=search_query)
+            return queryset.filter(condition).distinct()
+        return Product.objects.none()
+
 
 class ProductDetailView(DetailView):
     # model = Product # Необязательно
