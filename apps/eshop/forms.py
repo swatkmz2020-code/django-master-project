@@ -1,6 +1,7 @@
 from django import forms
 from eshop.models import Product
 
+
 class ProductForm(forms.ModelForm):
     tags_input = forms.CharField(
         required=False,
@@ -32,17 +33,22 @@ class ProductForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'})
         }
 
-    labels = {
-        'title': 'Название товара:',
-        'text': 'Описание товара:',
-        'category': 'Категория:',
-        'price': 'Цена',
-        'image': 'Картинка товара'
-    }
+        # ПЕРЕНЕСЕНО ВНУТРЬ CLASS META (иначе Django их не увидит)
+        labels = {
+            'title': 'Название товара:',
+            'text': 'Описание товара:',
+            'category': 'Категория:',
+            'price': 'Цена',
+            'image': 'Картинка товара'
+        }
 
-    help_texts = {
-        'category': "- можно выбрать только одну категорию",
-    }
+        help_texts = {
+            'category': "- можно выбрать только одну категорию",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = "- Категория -" # type: ignore
 
     def clean_title(self):
         title = self.cleaned_data['title'].strip()
@@ -58,4 +64,5 @@ class ProductForm(forms.ModelForm):
             if tag_name.strip()
         ]
         return tag_names
+
 
