@@ -47,6 +47,19 @@ class Product(models.Model):
         blank=True,
         verbose_name="Просмотрено пользователями"
     )
+    liked_by_users = models.ManyToManyField(
+            User,
+            related_name="liked_products",
+            blank=True,
+            verbose_name="Лайки"
+    )
+    disliked_by_users = models.ManyToManyField(
+        User,
+        related_name="disliked_products",
+        blank=True,
+        verbose_name="Дизлайки"
+    )
+
 
     class Meta:
         ordering = ['-created_at']
