@@ -1,7 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -20,7 +22,7 @@ class HomePageView(TemplateView):
 
 
 class ProductListView(ListView):
-    queryset = Product.objects.filter(status="published")
+    queryset = Product.objects.filter(status="published").select_related('category')
     context_object_name = 'products'
     template_name = 'eshop/pages/product_list.html'
 
@@ -30,9 +32,8 @@ class CategoryProductsView(ListView):
     template_name = 'eshop/pages/category_products.html'
 
     def get_queryset(self):
-            self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
-            return Product.objects.filter(category=self.category, status='published')
-            # return self.category.products.filter(status='published')
+        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        return Product.objects.filter(category=self.category, status='published')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -47,12 +48,12 @@ class TagProductsView(ListView):
     def get_queryset(self):
         self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
         return Product.objects.filter(tags=self.tag, status='published')
-        # return self.tag.products.filter(status='published')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tag'] = self.tag
         return context
+
 
 class ProductsSearchView(ListView):
     template_name = "eshop/pages/products_search.html"
@@ -67,7 +68,7 @@ class ProductsSearchView(ListView):
     def get_queryset(self):
         search_query = self.request.GET.get("q")
         if search_query:
-            queryset = Product.objects.filter(status="published") # .order_by("-created_at")
+            queryset = Product.objects.filter(status="published")
             condition = Q(title__icontains=search_query) | Q(text__icontains=search_query)
             search_in_categories = self.request.GET.get("in_categories") == 'on'
             search_in_tags = self.request.GET.get("in_tags") == 'on'
@@ -80,39 +81,52 @@ class ProductsSearchView(ListView):
 
 
 class ProductDetailView(DetailView):
-    # model = Product # Необязательно
     slug_url_kwarg = 'product_slug'
     template_name = 'eshop/pages/product_detail.html'
-    # context_object_name = 'product' # Необязательно
-    # slug_field = 'slug' # Необязательно
 
     def get_queryset(self):
-        # Товар доступен, если он опубликован или если текущий пользователь является его автором
+        base_queryset = Product.objects.select_related('category', 'author').prefetch_related(
+            'tags', 'liked_by_users', 'disliked_by_users'
+        )
         if self.request.user.is_authenticated:
-            return Product.objects.filter(
+            return base_queryset.filter(
                 Q(status="published") | Q(author=self.request.user)
             )
-        return Product.objects.filter(status="published")
+        return base_queryset.filter(status="published")
 
     def get_object(self, queryset=None):
         product: Product = super().get_object(queryset)  # type: ignore
-        # Явно задаем тип Product
 
         user = self.request.user
-        # Используем slug вместо id для уникального ключа просмотра в сессии
         session_key = f'product_{product.slug}_viewed'
         
         if not self.request.session.get(session_key, False) and product.author != user:
-            # Обновляем просмотры в базе данных по id (так как id у объекта все равно есть)
-            Product.objects.filter(id=product.id).update(views=F("views") + 1)  # type: ignore
+            Product.objects.filter(pk=product.pk).update(views=F("views") + 1)  # type: ignore
             product.views += 1
             self.request.session[session_key] = True
 
         if user.is_authenticated and user != product.author:
-            product.viewed_by_users.add(user) # Дубликатов записей не будет
+            product.viewed_by_users.add(user)
 
-            
         return product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        product = self.object  # type: ignore
+        
+        context['is_liked'] = False
+        context['is_disliked'] = False
+        
+        if user.is_authenticated:
+            context['is_liked'] = product.liked_by_users.filter(pk=user.pk).exists()
+            context['is_disliked'] = product.disliked_by_users.filter(pk=user.pk).exists()
+            
+        context['likes_count'] = product.liked_by_users.count()
+        context['dislikes_count'] = product.disliked_by_users.count()
+
+        return context
 
 
 class ProductAddView(LoginRequiredMixin, CreateView):
@@ -135,22 +149,18 @@ class ProductAddView(LoginRequiredMixin, CreateView):
             tag, _ = Tag.objects.get_or_create(name=tag_name)
             product.tags.add(tag)
                 
-            return redirect('eshop:product_detail', product_slug=product.slug)
-
         return redirect('eshop:product_detail', product_slug=product.slug)
 
 
-class ProductEditView(UpdateView):
+class ProductEditView(LoginRequiredMixin, UpdateView):
     model = Product
     slug_url_kwarg = 'product_slug'
     form_class = ProductForm
     template_name = 'eshop/pages/product_form.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # Добавляем ignore в конец строки 105
-        self.object = self.get_object() # type: ignore
+        self.object = self.get_object()  # type: ignore
         
-        # Добавляем ignore в конец строки 109
         if request.user != self.object.author:  # type: ignore
             return render(request, 'eshop/pages/not_allowed.html')
             
@@ -163,49 +173,92 @@ class ProductEditView(UpdateView):
         context['h1'] = "Редактирование"
         context['submit_button_text'] = "Сохранить"
         
-        # Добавляем ignore в конец строки 120
         context['form'].fields['tags_input'].initial = ", ".join(tag.name for tag in self.object.tags.all())  # type: ignore
         
         return context
-
 
     def form_valid(self, form):
         product = form.save()
         product.tags.clear()
         
-        # Получаем данные из поля формы
         raw_tags = form.cleaned_data.get('tags_input') or ''
         
-        # Если это строка — делим её по запятым, если уже список — оставляем как есть
         if isinstance(raw_tags, str):
             tag_names = [t.strip() for t in raw_tags.split(',') if t.strip()]
         else:
-            tag_names = raw_tags  # Если Django уже вернул список/QuerySet тегов
+            tag_names = raw_tags
             
         for tag_name in tag_names:
-            # Если в списке лежат объекты Tag, берем их имя, иначе саму строку
-            name = tag_name.name if hasattr(tag_name, 'name') else str(tag_name).strip() # type: ignore
+            name = tag_name.name if hasattr(tag_name, 'name') else str(tag_name).strip()  # type: ignore
             if name:
                 tag, _ = Tag.objects.get_or_create(name=name)
                 product.tags.add(tag)
             
-        return super().form_valid(form)
+        return redirect('eshop:product_detail', product_slug=product.slug)
 
 
-
-class ProductRemoveView(DeleteView):
+class ProductRemoveView(LoginRequiredMixin, DeleteView):
     model = Product
-    pk_url_kwarg = 'product_slug'
+    slug_url_kwarg = 'product_slug'
     template_name = 'eshop/pages/product_remove_confirm.html'
-    paginate_by = 3
-
-    # context_object_name = 'product' # Необязательно
     success_url = reverse_lazy('eshop:product_list')
 
     def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object() # type: ignore
-
-        if request.user != self.object.author: # type: ignore
-                return render(request, 'eshop/pages/not_allowed.html')
-
+        self.object = self.get_object()  # type: ignore
+        if request.user != self.object.author:  # type: ignore
+            return render(request, 'eshop/pages/not_allowed.html')
         return super().dispatch(request, *args, **kwargs)
+
+
+@require_POST
+def product_like(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    product = get_object_or_404(Product, pk=pk)
+    user = request.user
+
+    if product.author == user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    if product.liked_by_users.filter(pk=user.pk).exists():
+        product.liked_by_users.remove(user)
+        has_liked = False
+    else:
+        product.liked_by_users.add(user)
+        product.disliked_by_users.remove(user)
+        has_liked = True
+
+    return JsonResponse({
+        'likes_count': product.liked_by_users.count(),
+        'dislikes_count': product.disliked_by_users.count(),
+        'has_liked': has_liked,
+        'has_disliked': product.disliked_by_users.filter(pk=user.pk).exists(),
+    })
+
+
+@require_POST
+def product_dislike(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    product = get_object_or_404(Product, pk=pk)
+    user = request.user
+
+    if product.author == user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    if product.disliked_by_users.filter(pk=user.pk).exists():
+        product.disliked_by_users.remove(user)
+        has_disliked = False
+    else:
+        product.disliked_by_users.add(user)
+        product.liked_by_users.remove(user)
+        has_disliked = True
+
+    return JsonResponse({
+        'likes_count': product.liked_by_users.count(),
+        'dislikes_count': product.disliked_by_users.count(),
+        'has_liked': product.liked_by_users.filter(pk=user.pk).exists(),
+        'has_disliked': has_disliked,
+    })

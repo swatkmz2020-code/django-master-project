@@ -1,9 +1,14 @@
 {% extends "eshop/base.html" %}
 {% load bootstrap_icons %}
+{% load static %}
 
 {% block page_title %}
     Gastronom | {{ product.title }}
 {% endblock page_title %}
+
+{% block scripts %}
+    <script src="{% static "eshop/js/reactions.js" %}" type="module" defer></script>
+{% endblock scripts %}
 
 {% block page_content %}
     <a href="javascript:history.back()">&larr; Назад</a>
@@ -12,14 +17,13 @@
     <h3>{{ product.title }}</h3>
 
     {% if request.user == product.author %}
-        {% comment %} Статус: {{ product.status }} {% endcomment %}
         Статус: {{ product.get_status_display }}
     {% endif %}
 
     <p>Категория: <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></p>
 
     <p>
-    Теги:
+        Теги:
         {% for tag in product.tags.all %}
             <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
         {% empty %}
@@ -27,7 +31,6 @@
         {% endfor %}
     </p>
 
-    
     {% if product.country %}
         <p>Страна происхождения: <strong>{{ product.country }}</strong></p>
     {% endif %}
@@ -36,11 +39,47 @@
         <img src="{{ product.image.url }}" alt="{{ product.title }}" width="200" style="height: auto; border-radius: 8px;">
     {% endif %}
 
-
     <p>{{ product.text }}</p>
     <p>{{ product.price }}</p>
     <p>Дата добавления товара: <span class="date-field">{{ product.created_at|date:"c" }}</span></p>
     <p>Дата последнего изменения товара: <span class="date-field">{{ product.updated_at|date:"c" }}</span></p>
+
+    <div
+        id="productReactions"
+        data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+        data-login-url="{% url 'users:login' %}"
+    >
+        <!-- Кнопка Лайка -->
+        <button
+            id='likeBtn'
+            class="btn btn-sm {% if is_liked %}btn-primary{% else %}btn-outline-primary{% endif %} {% if request.user == product.author %}disabled{% endif %} js-reaction-btn"
+            data-url="{% url 'eshop:product_like' product.id %}"
+        >
+            <span class="js-icon-fill {% if not is_liked %}d-none{% endif %}">
+                {% bs_icon 'hand-thumbs-up-fill' %}
+            </span>
+            <span class="js-icon-empty {% if is_liked %}d-none{% endif %}">
+                {% bs_icon 'hand-thumbs-up' %}
+            </span>
+            <span id="likesCount">{{ likes_count }}</span>
+        </button>
+
+        <!-- Кнопка Дизлайка -->
+        <button
+            id='dislikeBtn'
+            class="btn btn-sm {% if is_disliked %}btn-danger{% else %}btn-outline-danger{% endif %} {% if request.user == product.author %}disabled{% endif %} js-reaction-btn"
+            data-url="{% url 'eshop:product_dislike' product.id %}"
+        >
+            <span class="js-icon-fill {% if not is_disliked %}d-none{% endif %}">
+                {% bs_icon 'hand-thumbs-down-fill' %}
+            </span>
+            <span class="js-icon-empty {% if is_disliked %}d-none{% endif %}">
+                {% bs_icon 'hand-thumbs-down' %}
+            </span>
+            <span id="dislikesCount">{{ dislikes_count }}</span>
+        </button>
+    </div>
+
     <p>
         Автор товара:
         {% if product.author %}
@@ -58,6 +97,7 @@
         <a href="{% url 'eshop:product_remove' product_slug=product.slug %}">Удалить</a>
     {% endif %}
 {% endblock page_content %}
+
 
 
 
