@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
 from django.http import JsonResponse
@@ -148,7 +149,8 @@ class ProductAddView(LoginRequiredMixin, CreateView):
         for tag_name in tag_names:
             tag, _ = Tag.objects.get_or_create(name=tag_name)
             product.tags.add(tag)
-                
+
+        messages.success(self.request, 'Товар успешно добавлен!')       
         return redirect('eshop:product_detail', product_slug=product.slug)
 
 
