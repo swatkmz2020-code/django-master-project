@@ -1,4 +1,4 @@
-import { productAction } from "../../../../static/js/utils.js"
+import { productAction } from "../../../../static/eshop/js/utils.js"
 
 const productReactions = document.querySelector("#productReactions")
 
