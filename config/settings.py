@@ -152,3 +152,7 @@ MAILERS = {
 
 LOGIN_URL = 'users:login'
 DEFAULT_LOGIN_REDIRECT_URL = 'users:profile'
+
+UTHENTICATION_BACKENDS = [
+    'users.auth_backend.EmailOrUsernameBackend'
+]
