@@ -15,6 +15,7 @@ urlpatterns = [
     path('products/<slug:product_slug>/remove/', views.ProductRemoveView.as_view(), name="product_remove"),
     path('products/<int:pk>/like/', views.product_like, name="product_like"),
     path('products/<int:pk>/dislike/', views.product_dislike, name="product_dislike"),
+    path('products/<int:product_id>/toggle-favorite/', views.product_favorite_toggle_view, name="product_favorite_toggle"),
 
 ]
 

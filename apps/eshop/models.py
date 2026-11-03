@@ -59,7 +59,12 @@ class Product(models.Model):
         blank=True,
         verbose_name="Дизлайки"
     )
-
+    favorited_by_users = models.ManyToManyField(
+            User,
+            related_name="favorited_products",
+            blank=True,
+            verbose_name="Добавил в избранное"
+    )
 
     class Meta:
         ordering = ['-created_at']

@@ -10,12 +10,21 @@
     <link rel="stylesheet" href="{% static 'eshop/css/includes/product_container.css' %}">
 {% endblock styles %}
 
+{% block scripts %}
+    <script src="{% static "eshop/js/favorites.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
+
 {% block page_content %}
     <h1>Профиль пользователя: {{ user.username }}</h1>
     <p>Имя: {{ user.first_name|default:"Михаил" }}</p>
     <p>Фамилия: {{ user.last_name|default:"Святский" }}</p>
     <p>Email: {{ user.email|default:"swatkmz2020@gmail.com" }}</p>
-
+    <div class="text-center">
+        <a href="{% url 'users:favorite_products' %}" class="btn btn-outline-primary mb-2">
+            Посмотреть избранные товары
+        </a>
+    </div>
     <h2>Товары пользователя:</h2>
     {% for product in products %}
         {% if user == request.user or product.status != 'draft' %}

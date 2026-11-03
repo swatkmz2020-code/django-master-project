@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
 from users.forms import CustomAuthenticationForm
@@ -38,6 +38,16 @@ class LoginView(AuthLoginView):
 
 class LogoutView(AuthLogoutView):
     next_page = reverse_lazy('eshop:home_page')
+
+
+class FavoriteProductsView(ListView):
+    template_name = 'users/pages/favorite_products.html'
+    context_object_name = "products"
+    paginate_by = 2
+
+    def get_queryset(self):
+        return self.request.user.favorited_products.all() # type: ignore
+
 
 
 class ProfileView(DetailView, MultipleObjectMixin):

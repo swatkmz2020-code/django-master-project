@@ -264,3 +264,19 @@ def product_dislike(request, pk):
         'has_liked': product.liked_by_users.filter(pk=user.pk).exists(),
         'has_disliked': has_disliked,
     })
+
+
+def product_favorite_toggle_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.user in product.favorited_by_users.all():
+        product.favorited_by_users.remove(request.user)
+        is_favorite = False
+    else:
+        product.favorited_by_users.add(request.user)
+        is_favorite = True
+
+    return JsonResponse({
+        'is_favorite': is_favorite,
+        'favorites_count': product.favorited_by_users.count()
+    })

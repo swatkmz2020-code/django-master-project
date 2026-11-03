@@ -1,0 +1,30 @@
+{% extends "eshop/base.html" %}
+{% load static %}
+
+{% block page_title %}
+    {{ block.super }} | Избранные товары
+{% endblock page_title %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'eshop/css/includes/product_container.css' %}">
+{% endblock styles %}
+
+{% block scripts %}
+    <script src="{% static "eshop/js/favorites.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
+{% block page_content %}
+    <h1 class="text-center">Избранные товары</h1>
+
+    <div class="container" data-page-type="favorite-products">
+        <div class="products-list">
+            {% for product in products %}
+                {% include 'eshop/includes/product_container.html' %}
+            {% empty %}
+                <p class="text-center">Пока нет избранных товаров.</p>
+            {% endfor %}
+        </div>
+
+        {% include "eshop/includes/pagination.html" %}
+    </div>
+{% endblock page_content %}
