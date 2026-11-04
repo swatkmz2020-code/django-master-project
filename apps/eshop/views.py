@@ -16,7 +16,7 @@ from django.views.generic import (
 )
 
 from eshop.forms import ProductForm
-from eshop.models import Category, Product, Tag
+from eshop.models import Category, Comment, Product, Tag
 
 
 class HomePageView(TemplateView):
@@ -314,4 +314,31 @@ def product_favorite_toggle_view(request, product_id):
         'status': 'success',
         'is_favorite': is_favorite,
         'favorites_count': product.favorited_by_users.count()
+    })
+
+
+@require_POST
+def add_comment_view(request, product_id):
+    text = request.POST.get('text').strip()
+    if not text:
+        return JsonResponse({'success': False, 'error': 'Текст комментария не может быть пустым'})
+
+    product = get_object_or_404(Product, id=product_id)
+    comment = Comment.objects.create(
+        product=product,
+        author=request.user,
+        text=text
+    )
+
+    comment_html = render_to_string(
+        "eshop/includes/comment_container.html",
+        {"comment": comment},
+        request
+    )
+
+    return JsonResponse({
+        'success': True,
+        'comment_html': comment_html,
+        'comments_count': product.comments.count()  # type: ignore
+
     })

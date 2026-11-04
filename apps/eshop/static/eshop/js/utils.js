@@ -24,12 +24,14 @@ export async function getAction(url) {
     return await response.json();
 }
 
-export async function productAction(url) {
+export async function productAction(url, bodyData = null) {
+    // ОБЯЗАТЕЛЬНО добавляем "const response =" перед fetch
     const response = await fetch(url, {
         method: "POST",
         headers: {
             'X-CSRFToken': getCookie('csrftoken')
-        }
+        },
+        body: bodyData // Не забудьте передать само тело (formData), иначе комментарий уйдет пустым
     });
 
     if (!response.ok) {
@@ -39,3 +41,4 @@ export async function productAction(url) {
 
     return await response.json();
 }
+

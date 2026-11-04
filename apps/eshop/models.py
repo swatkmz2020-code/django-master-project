@@ -131,3 +131,18 @@ class Tag(models.Model):
 
     def __str__(self):
         return f'#{self.name}'
+
+class Comment(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    text = models.TextField(verbose_name='Текст')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Комментарий от {self.author} к товару "{self.product}": {self.text if len(self.text) < 20 else self.text[:20] + '...'}'
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'комментарий'
+        verbose_name_plural = "комментарии"
+        # db_table = "eshop_comments"
