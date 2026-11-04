@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 from django.views.generic import (
@@ -23,10 +24,43 @@ class HomePageView(TemplateView):
 
 
 class ProductListView(ListView):
-    queryset = Product.objects.filter(status="published").select_related('category')
     context_object_name = 'products'
     template_name = 'eshop/pages/product_list.html'
+    products_per_batch = 24
 
+    def get_queryset(self):
+        self.products_queryset = Product.objects.filter(status="published")
+        return self.products_queryset[:ProductListView.products_per_batch]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["has_more_products"] = self.products_queryset.count() > ProductListView.products_per_batch
+        context["products_per_batch"] = ProductListView.products_per_batch
+
+        return context
+
+
+def load_more_products_view(request):
+    # import time
+    # time.sleep(1)
+
+    offset = int(request.GET.get("offset"))
+    products_queryset = Product.objects.filter(status="published")
+    products = products_queryset[offset:offset + ProductListView.products_per_batch]
+
+    products_html = ''.join(
+        [
+            render_to_string("blog/includes/product_container.html", {"product": product}, request)
+            for product in products
+        ]
+    )
+    has_more_products = offset + ProductListView.products_per_batch < products_queryset.count()
+
+    return JsonResponse({
+        'html': products_html,
+        'has_more': has_more_products
+    })
 
 class CategoryProductsView(ListView):
     context_object_name = 'products'

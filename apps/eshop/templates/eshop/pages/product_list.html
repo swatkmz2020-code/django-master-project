@@ -20,15 +20,29 @@
 
     {# Отображение товаров из базы данных #}
     {% if products %}
-        <!-- Обернули весь цикл в контейнер-сетку -->
-        <div class="products-grid">
+    
+        <!-- Все атрибуты должны быть внутри одной открывающей скобки <div ... > -->
+        <div class="products-grid" 
+                id="productsContainer" 
+                data-initial-offset="{{ products|length }}"
+                data-has-more="{% if has_more_products %}true{% else %}false{% endif %}"
+                data-batch-size="{{ products_per_batch }}"
+                data-load-more-url="{% url 'eshop:load_more_products' %}">
             {% for product in products %}
+            
                 <!-- Подключили единый квадратный шаблон карточки -->
                 {% include "eshop/includes/product_container.html" %}
             {% endfor %}
         </div>
+
         
-        {% include "eshop/includes/pagination.html" %}
+        {% if has_more_products %}
+            <div id="loadingSpinner" class="text-center d-none">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        {% endif %}
     {% else %}
         <p>Товаров еще нет. Загляните позже!</p>
     {% endif %}
