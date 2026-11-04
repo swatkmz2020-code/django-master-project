@@ -1,11 +1,13 @@
 {% extends "eshop/base.html" %}
-{% load static %}
+{% load static %} 
 
 {% block page_title %}
     {{ block.super }} | Избранные товары
 {% endblock page_title %}
 
 {% block styles %}
+    <!-- ДОБАВИЛИ СТИЛИ СЕТКИ КАТАЛОГА -->
+    <link rel="stylesheet" href="{% static 'eshop/css/pages/product_list.css' %}">
     <link rel="stylesheet" href="{% static 'eshop/css/includes/product_container.css' %}">
 {% endblock styles %}
 
@@ -17,14 +19,19 @@
     <h1 class="text-center">Избранные товары</h1>
 
     <div class="container" data-page-type="favorite-products">
-        <div class="products-list">
+        
+        <div class="products-grid">
             {% for product in products %}
-                {% include 'eshop/includes/product_container.html' %}
+                <div class="product-container-wrapper" id="product-card-{{ product.id }}">
+                    {% include 'eshop/includes/product_container.html' %}
+                </div>
             {% empty %}
-                <p class="text-center">Пока нет избранных товаров.</p>
+                <p class="text-center w-100">Пока нет избранных товаров.</p>
             {% endfor %}
         </div>
-
-        {% include "eshop/includes/pagination.html" %}
+        
     </div>
+
+
 {% endblock page_content %}
+

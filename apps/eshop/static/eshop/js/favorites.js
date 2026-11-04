@@ -23,39 +23,47 @@ document.addEventListener('click', async (event) => {
             ? productCardElement.querySelector('.favorites-count') 
             : favoriteBtnElement.querySelector('.favorites-count')
 
+        // 1. Сначала железно отправляем запрос на бэкенд и ждем ответа базы данных
         const data = await productAction(url)
         
+        // 2. Только после получения ответа меняем визуальное состояние
         if (data.is_favorite) {
             iconEmpty?.classList.add('d-none')
             iconFilled?.classList.remove('d-none')
         } else {
             iconEmpty?.classList.remove('d-none')
             iconFilled?.classList.add('d-none')
+            
+            // Если товар больше не в избранном и мы на странице Избранного — удаляем карточку
             if (productCardElement) {
                 removeProductFromFavorites(productCardElement)
             }
         }
         
+        // 3. Обновляем счетчик лайков числом, которое пришло из базы данных
         if (favoritesCountElement) {
             favoritesCountElement.textContent = data.favorites_count
         }
     }
 })
 
-// Функция для удаления товара со страницы избранных
+// Функция для плавного удаления товара со страницы избранных
 function removeProductFromFavorites(productCardElement) {
-    // Проверка, находимся ли на странице избранных (проверяем по data-атрибуту)
-    if (document.querySelector('[data-page-type="favorite-products"]') !== null) { 
-        // Удаляем карточку товара
-        productCardElement.remove()
+    const favoriteContainer = document.querySelector('[data-page-type="favorite-products"]')
+    
+    if (favoriteContainer !== null) { 
+        // Находим родительскую обертку всей карточки в сетке, чтобы не ломать структуру сетки Grid
+        const cardWrapper = productCardElement.closest('.product-container-wrapper') || productCardElement;
+        
+        // Удаляем элемент с экрана
+        cardWrapper.remove()
 
-        // Проверяем, остались ли товары на странице
-        const remainingProducts = document.querySelectorAll('.product-card')
+        // Проверяем, остались ли товары в сетке
+        const remainingProducts = favoriteContainer.querySelectorAll('.product-container')
         if (remainingProducts.length === 0) {
-            // Показываем сообщение о пустом списке избранных
-            const container = document.querySelector('.container')
-            if (container) {
-                container.innerHTML = '<p class="text-center">Пока нет избранных постов.</p>'
+            const gridContainer = favoriteContainer.querySelector('.products-grid')
+            if (gridContainer) {
+                gridContainer.innerHTML = '<p class="text-center w-100">Пока нет избранных товаров.</p>'
             }
         }
     }

@@ -53,10 +53,15 @@
     {% if search_performed %}
         {% if products %}
             <h2>Найден(-о) {{ paginator.count }} товар(-а, -ов):</h2>
+            <!-- Добавляем открывающий тег сетки перед циклом -->
+            <div class="products-grid">
+                {% for product in products %}
+                    {% include 'eshop/includes/product_container.html' %}
+                {% endfor %}
+            </div> <!-- Закрываем тег сетки после цикла -->
+        
+        {% include 'eshop/includes/pagination.html' %}
 
-            {% for product in products %}
-                {% include 'eshop/includes/product_container.html' %}
-            {% endfor %}
 
             {% include "eshop/includes/pagination.html" %}
         {% else %}

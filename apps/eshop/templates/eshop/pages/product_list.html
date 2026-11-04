@@ -20,30 +20,19 @@
 
     {# Отображение товаров из базы данных #}
     {% if products %}
-        {% for product in products %}
-            <div class="product-container">
-                <h2>
-                    <a href="{% url 'eshop:product_detail' product.slug %}" class="product-link">
-                        {{ product.title }}
-                    </a>
-                </h2>
-                <p class="product-text">
-                    <strong>Описание товара:</strong> {{ product.text }}
-                </p>
-                <p class="product-country">
-                    <strong>Страна происхождения:</strong> {{ product.country }}
-                </p>
-                <p class="product-price">
-                    <strong>Цена:</strong> {{ product.price }} ₽
-                </p>
-                <small>Дата добавления товара: {{ product.created_at|date:"d.m.Y H:i" }}</small>
-            </div>
-        {% endfor %}
+        <!-- Обернули весь цикл в контейнер-сетку -->
+        <div class="products-grid">
+            {% for product in products %}
+                <!-- Подключили единый квадратный шаблон карточки -->
+                {% include "eshop/includes/product_container.html" %}
+            {% endfor %}
+        </div>
         
         {% include "eshop/includes/pagination.html" %}
     {% else %}
         <p>Товаров еще нет. Загляните позже!</p>
     {% endif %}
 {% endblock page_content %}
+
 
 

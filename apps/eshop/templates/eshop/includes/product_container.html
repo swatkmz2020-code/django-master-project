@@ -1,64 +1,70 @@
 {% load bootstrap_icons %}
 
 <div class="product-container">
-    <h2>
-        <a href="{{ product.get_absolute_url }}" class="product-link">
-            {{ product.title }}
-        </a>
-    </h2>
+    <!-- Блок картинки (как на Ozon) -->
+    <div class="product-image-wrapper">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-card-img">
+        {% else %}
+            <!-- Заглушка, если у товара нет фото -->
+            <div class="product-img-placeholder">
+                {% bs_icon 'image' extra_classes='placeholder-icon' %}
+            </div>
+        {% endif %}
 
-    {% if request.user == product.author and request.resolver_match.url_name != 'profile' %}
-        <span class="badge bg-primary bg-opacity-10 border border-primary border-opacity-25">
-            {% bs_icon 'person-fill' extra_classes='me-1' %}
-            Мой товар
-        </span>
-    {% endif %}
-
-    {% if request.user in product.viewed_by_users.all %}
-    <div class="badge bg-primary">
-        Просмотрено
-    </div>
-    {% endif %}
-
-    <p>Категория: <a href="{{ product.category.get_absolute_url }}"class="product-link">{{ product.category }}</a></p>
-    <p>
-        Теги:
-        {% for tag in product.tags.all %}
-            <a href="{{ tag.get_absolute_url }}"class="product-link">{{ tag }}</a>{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            нет тегов
-        {% endfor %}
-    </p>
-
-    <p class="product-text">
-        <strong>Описание товара:</strong> {{ product.text }}
-    </p>
-    <p class="product-country">
-        <strong>Страна происхождения:</strong> {{ product.country }}
-    </p>
-    <p class="product-price">
-        <strong>Цена:</strong> {{ product.price }} ₽
-    </p>
-    <small>Дата добавления товара: <span class="date-field">{{ product.created_at|date:"c" }}</span></small>
-        <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"></div>
-        <!-- Дата создания -->
-    <div>
-        <!-- Кнопка избранного -->
-        <button
-            class="btn btn-link pe-0 {% if request.user == prpduct.author %}disabled{% endif %} favorite-btn"
-            data-product-favorite-toggle-url="{% url "eshop:product_favorite_toggle" product.id %}"
-            data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
-            data-login-url="{% url 'users:login' %}"
-        >
-            {% if request.user in product.favorited_by_users.all %}
-                {% bs_icon 'star' extra_classes='favorite-icon icon-empty d-none' %}
-                {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled' %}
-            {% else %}
-                {% bs_icon 'star' extra_classes='favorite-icon icon-empty' %}
-                {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled d-none' %}
+        <!-- Бейджи поверх картинки -->
+        <div class="product-badges">
+            {% if request.user == product.author and request.resolver_match.url_name != 'profile' %}
+                <span class="badge bg-primary bg-opacity-75 text-white">Мой товар</span>
             {% endif %}
-        </button>
-        <span class="favorites-count">{{ product.favorited_by_users.count }}</span>
+            {% if request.user in product.viewed_by_users.all %}
+                <span class="badge bg-secondary bg-opacity-75 text-white">Просмотрено</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Текстовый блок ПОД картинкой -->
+    <div class="product-content-bottom">
+        <h2 class="product-title-block">
+            <a href="{{ product.get_absolute_url }}" class="product-link">
+                {{ product.title }}
+            </a>
+        </h2>
+
+        <p class="product-description">
+            {{ product.text }}
+        </p>
+    </div>
+
+    <!-- Подвал карточки с ценой и избранным -->
+    <div class="product-footer">
+        <div class="product-footer-top">
+            <p class="product-price">
+                {{ product.price }} ₽
+            </p>
+            
+            <div class="favorite-block">
+                <button
+                    class="btn btn-link p-0 {% if request.user == product.author %}disabled{% endif %} favorite-btn"
+                    data-product-favorite-toggle-url="{% url 'eshop:product_favorite_toggle' product.id %}"
+                    data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+                    data-login-url="{% url 'users:login' %}"
+                >
+                    {% if request.user in product.favorited_by_users.all %}
+                        {% bs_icon 'star' extra_classes='favorite-icon icon-empty d-none' %}
+                        {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled' %}
+                    {% else %}
+                        {% bs_icon 'star' extra_classes='favorite-icon icon-empty' %}
+                        {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled d-none' %}
+                    {% endif %}
+                </button>
+                <span class="favorites-count">{{ product.favorited_by_users.count }}</span>
+            </div>
+        </div>
+        <small class="product-date">
+            {{ product.created_at|date:"d.m.Y" }}
+        </small>
     </div>
 </div>
+
 

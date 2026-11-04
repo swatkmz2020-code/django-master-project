@@ -277,6 +277,7 @@ def product_favorite_toggle_view(request, product_id):
         is_favorite = True
 
     return JsonResponse({
+        'status': 'success',
         'is_favorite': is_favorite,
         'favorites_count': product.favorited_by_users.count()
     })

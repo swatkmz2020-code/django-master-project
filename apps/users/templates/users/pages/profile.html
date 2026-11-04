@@ -7,8 +7,10 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'users/css/pages/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'eshop/css/pages/product_list.css' %}"> 
     <link rel="stylesheet" href="{% static 'eshop/css/includes/product_container.css' %}">
 {% endblock styles %}
+
 
 {% block scripts %}
     <script src="{% static "eshop/js/favorites.js" %}" type="module" defer></script>
@@ -25,15 +27,28 @@
             Посмотреть избранные товары
         </a>
     </div>
-    <h2>Товары пользователя:</h2>
-    {% for product in products %}
-        {% if user == request.user or product.status != 'draft' %}
-            {% include 'eshop/includes/product_container.html' %}
-        {% endif %}
-        
-        {% include "eshop/includes/pagination.html" %}
-    {% empty %}
-        <p>У этого пользователя пока нет товаров.</p>
-    {% endfor %}
-{% endblock page_content %}
+        <h2>Товары пользователя:</h2>
+    
+        <div class="products-grid">
+        {% for product in products %}
+            {% if user == request.user or product.status != 'draft' %}
+                {% include "eshop/includes/product_container.html" %}
+            {% endif %}
+        {% empty %}
+            <p>У этого пользователя пока нет товаров.</p>
+        {% endfor %}
+    </div>
 
+    {% include "eshop/includes/pagination.html" %}
+
+<script>
+    window.addEventListener('pageshow', function (event) {
+        // Если тип навигации равен 2 (это переход по кнопке НАЗАД/ВПЕРЕД)
+        // или если страница была восстановлена из кэша (persisted)
+        if (event.persisted || performance.navigation.type === 2) {
+            window.location.reload();
+        }
+    });
+</script>
+
+{% endblock page_content  %}

@@ -8,6 +8,9 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
 from users.forms import CustomAuthenticationForm
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+
 
 User = get_user_model()
 
@@ -43,13 +46,13 @@ class LogoutView(AuthLogoutView):
 class FavoriteProductsView(ListView):
     template_name = 'users/pages/favorite_products.html'
     context_object_name = "products"
-    paginate_by = 2
+    paginate_by = 24
 
     def get_queryset(self):
         return self.request.user.favorited_products.all() # type: ignore
 
 
-
+@method_decorator(never_cache, name='dispatch')
 class ProfileView(DetailView, MultipleObjectMixin):
     model = User
     slug_url_kwarg = 'username'
