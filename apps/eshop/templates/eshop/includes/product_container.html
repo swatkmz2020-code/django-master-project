@@ -45,12 +45,14 @@
             
             <!-- Блок интерактивных иконок (избранное и отзывы) -->
             <div class="product-actions d-flex align-items-center gap-3">
-                <!-- Блок количества отзывов -->
-                <!-- Измените блок количества комментариев в шаблоне -->
-            <div class="comments-count-block d-flex align-items-center gap-1 text-warning">
-                {% bs_icon 'chat' extra_classes='comment-icon' %}
-                <span class="comments-count">{{ product.comments.count }}</span>
-            </div>
+                <!-- Измените блок количества отзывов в шаблоне -->
+
+                <a href="{{ product.get_absolute_url }}#comments" class="comments-count-block favorite-icon d-flex align-items-center gap-1 text-decoration-none" style="color: inherit;">
+                    {% bs_icon 'chat' extra_classes='comment-icon' %}
+                    <span class="comments-count">{{ product.comments.count }}</span>
+                </a>
+
+
 
 
                 <!-- Блок избранного -->
