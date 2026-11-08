@@ -51,7 +51,7 @@ def load_more_products_view(request):
 
     products_html = ''.join(
         [
-            render_to_string("blog/includes/product_container.html", {"product": product}, request)
+            render_to_string("eshop/includes/product_container.html", {"product": product}, request)
             for product in products
         ]
     )
@@ -162,7 +162,8 @@ class ProductDetailView(DetailView):
         context['likes_count'] = product.liked_by_users.count()
         context['dislikes_count'] = product.disliked_by_users.count()
 
-        comments_queryset = product.comments.all()
+        # Берем только корневые комментарии (без родителей)
+        comments_queryset = product.comments.filter(parent__isnull=True)
         context["comments"] = comments_queryset[:self.comments_per_batch]
         context["has_more_comments"] = comments_queryset.count() > self.comments_per_batch
         context["comments_per_batch"] = self.comments_per_batch
@@ -330,11 +331,15 @@ def add_comment_view(request, product_id):
         return JsonResponse({'success': False, 'error': 'Текст комментария не может быть пустым'})
 
     product = get_object_or_404(Product, id=product_id)
-    comment = Comment.objects.create(
-        product=product,
-        author=request.user,
-        text=text
-    )
+    parent_id = request.POST.get('parent_id')
+    comment_data = {
+        'product': product,
+        'author': request.user,
+        'text': text
+    }
+    if parent_id is not None:
+        comment_data['parent'] = Comment.objects.get(id=parent_id)
+    comment = Comment.objects.create(**comment_data)
 
     comment_html = render_to_string(
         "eshop/includes/comment_container.html",
@@ -357,7 +362,8 @@ def load_more_comments_view(request, product_id):
 
     offset = int(request.GET.get("offset"))
     product = get_object_or_404(Product, id=product_id)
-    comments_queryset = product.comments.all() # type: ignore
+    # Берем только корневые комментарии (без родителей)
+    comments_queryset = product.comments.filter(parent__isnull=True)  # type: ignore
     comments = comments_queryset[offset:offset + ProductDetailView.comments_per_batch]
 
     comments_html = ''.join(

@@ -137,8 +137,22 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField(verbose_name='Текст')
     created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="replies"
+    )
 
     def __str__(self):
+        if self.parent:
+            parent_text = self.parent.text[:20] + '...' if len(self.parent.text) > 20 else self.parent.text
+            reply_text = self.text[:20] + '...' if len(self.text) > 20 else self.text
+            return (
+                f'Ответ от {self.author} на отзыв  пользователя {self.parent.author}: '
+                f'комм. "{parent_text}", отв. "{reply_text}"'
+            )
         return f'Комментарий от {self.author} к товару "{self.product}": {self.text if len(self.text) < 20 else self.text[:20] + '...'}'
 
     class Meta:
