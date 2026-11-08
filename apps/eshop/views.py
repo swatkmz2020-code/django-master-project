@@ -118,6 +118,7 @@ class ProductsSearchView(ListView):
 class ProductDetailView(DetailView):
     slug_url_kwarg = 'product_slug'
     template_name = 'eshop/pages/product_detail.html'
+    comments_per_batch = 5
 
     def get_queryset(self):
         base_queryset = Product.objects.select_related('category', 'author').prefetch_related(
@@ -160,6 +161,11 @@ class ProductDetailView(DetailView):
             
         context['likes_count'] = product.liked_by_users.count()
         context['dislikes_count'] = product.disliked_by_users.count()
+
+        comments_queryset = product.comments.all()
+        context["comments"] = comments_queryset[:self.comments_per_batch]
+        context["has_more_comments"] = comments_queryset.count() > self.comments_per_batch
+        context["comments_per_batch"] = self.comments_per_batch
 
         return context
 
@@ -341,4 +347,28 @@ def add_comment_view(request, product_id):
         'comment_html': comment_html,
         'comments_count': product.comments.count()  # type: ignore
 
+    })
+
+
+
+def load_more_comments_view(request, product_id):
+    from time import sleep
+    sleep(0.5)
+
+    offset = int(request.GET.get("offset"))
+    product = get_object_or_404(Product, id=product_id)
+    comments_queryset = product.comments.all() # type: ignore
+    comments = comments_queryset[offset:offset + ProductDetailView.comments_per_batch]
+
+    comments_html = ''.join(
+        [
+            render_to_string("eshop/includes/comment_container.html", {"comment": comment}, request)
+            for comment in comments
+        ]
+    )
+    has_more_comments = offset + ProductDetailView.comments_per_batch < comments_queryset.count()
+
+    return JsonResponse({
+        'html': comments_html,
+        'has_more': has_more_comments
     })

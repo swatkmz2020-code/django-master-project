@@ -9,23 +9,36 @@ class BatchLoader {
         this.hasMore = this.container.dataset.hasMore.toLowerCase() === 'true'
         this.batchSize = Number(this.container.dataset.batchSize)
         this.loadMoreUrl = this.container.dataset.loadMoreUrl
-        this.loading = false;
+        this.loading = false
+        this.triggerType = this.container.dataset.triggerType // scroll или button
 
         this.init()
     }
 
     init() {
-        window.addEventListener('scroll', () => {
-            if ((window.scrollY + window.innerHeight) > (document.documentElement.scrollHeight - 1)) {
+        if (this.triggerType === 'scroll') {
+            window.addEventListener('scroll', () => {
+                if ((window.scrollY + window.innerHeight) > (document.documentElement.scrollHeight - 1)) {
                 this.loadMore()
+                }
+            })
+        } else if (this.triggerType === 'button') {
+            this.loadMoreBtn = document.getElementById(this.container.dataset.loadMoreBtnId)
+            if (this.loadMoreBtn) {
+                this.loadMoreBtn.addEventListener('click', () => {
+                this.loadMore()
+                })
             }
-        });
+        }
     }
 
     async loadMore() {
         if (this.loading || !this.hasMore) return
 
-        this.loading = true;
+        this.loading = true
+        if (this.triggerType === 'button') {
+            this.loadMoreBtn.classList.add("d-none")
+        }
         document.getElementById("loadingSpinner")?.classList.remove("d-none")
 
         try {
@@ -39,8 +52,12 @@ class BatchLoader {
         } catch (error) {
             console.error("Ошибка загрузки:", error)
         } finally {
-            this.loading = false;
+            this.loading = false
             document.getElementById("loadingSpinner")?.classList.add("d-none")
+              // Если кнопочная версия и есть ещё сущности для загрузки - возвращаем кнопку
+            if (this.triggerType === 'button' && this.hasMore) {
+                this.loadMoreBtn.classList.remove("d-none")
+            }
         }
     }
 }

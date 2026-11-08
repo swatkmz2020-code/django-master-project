@@ -23,11 +23,13 @@
     
         <!-- Все атрибуты должны быть внутри одной открывающей скобки <div ... > -->
         <div class="products-grid" 
-                id="productsContainer" 
-                data-initial-offset="{{ products|length }}"
-                data-has-more="{% if has_more_products %}true{% else %}false{% endif %}"
-                data-batch-size="{{ products_per_batch }}"
-                data-load-more-url="{% url 'eshop:load_more_products' %}">
+            id="productsContainer" 
+            data-initial-offset="{{ products|length }}"
+            data-has-more="{% if has_more_products %}true{% else %}false{% endif %}"
+            data-batch-size="{{ products_per_batch }}"
+            data-load-more-url="{% url 'eshop:load_more_products' %}"
+            data-trigger-type="scroll"
+        >
             {% for product in products %}
             
                 <!-- Подключили единый квадратный шаблон карточки -->

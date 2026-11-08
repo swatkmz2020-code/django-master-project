@@ -20,7 +20,7 @@ commentFormElement.addEventListener('submit', async function(event) {
             // Очищаем текстовое поле
             this.querySelector('textarea').value = '';
 
-            // Добавляем новый комментарий в начало списка
+            // Добавляем новый отзыв в начало списка
             const commentsListElement = document.getElementById('commentsList');
             const emptyMessageElement = commentsListElement.querySelector('#emptyMessage');
 
@@ -33,17 +33,20 @@ commentFormElement.addEventListener('submit', async function(event) {
             const dateElement = newCommentElement.querySelector('.date-field');
             formatDate(dateElement);
 
-            // Обновляем счетчик комментариев в заголовке
+            // УВЕЛИЧИВАЕМ offset на 1, так как добавили новый отзыв
+            window.commentsBatchLoader.offset += 1
+
+            // Обновляем счетчик отзывов в заголовке
             const commentsTitleElement = document.querySelector('#commentsTitle');
-            commentsTitleElement.textContent = `Комментарии (${data.comments_count})`;
+            commentsTitleElement.textContent = `Отзывы (${data.comments_count})`;
         } else {
             // Показываем ошибку
             commentErrorsElement.textContent = data.error;
             commentErrorsElement.classList.remove('d-none');
         }
     } catch (error) {
-        console.error('Ошибка при добавлении комментария:', error);
-        commentErrorsElement.textContent = 'Произошла ошибка при отправке комментария';
+        console.error('Ошибка при добавлении отзыва:', error);
+        commentErrorsElement.textContent = 'Произошла ошибка при отправке отзыва';
         commentErrorsElement.classList.remove('d-none');
     }
 });

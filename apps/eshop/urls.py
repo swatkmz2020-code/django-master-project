@@ -18,6 +18,7 @@ urlpatterns = [
     path('products/<int:pk>/dislike/', views.product_dislike, name="product_dislike"),
     path('products/<int:product_id>/toggle-favorite/', views.product_favorite_toggle_view, name="product_favorite_toggle"),
     path("products/<int:product_id>/comments/add/", views.add_comment_view, name="add_comment"),
+    path('products/<int:product_id>/comments/load-more/', views.load_more_comments_view, name="load_more_comments"),
 
 ]
 
