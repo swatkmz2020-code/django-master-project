@@ -43,22 +43,34 @@
                 {{ product.price }} ₽
             </p>
             
-            <div class="favorite-block">
-                <button
-                    class="btn btn-link p-0 {% if request.user == product.author %}disabled{% endif %} favorite-btn"
-                    data-product-favorite-toggle-url="{% url 'eshop:product_favorite_toggle' product.id %}"
-                    data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
-                    data-login-url="{% url 'users:login' %}"
-                >
-                    {% if request.user in product.favorited_by_users.all %}
-                        {% bs_icon 'star' extra_classes='favorite-icon icon-empty d-none' %}
-                        {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled' %}
-                    {% else %}
-                        {% bs_icon 'star' extra_classes='favorite-icon icon-empty' %}
-                        {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled d-none' %}
-                    {% endif %}
-                </button>
-                <span class="favorites-count">{{ product.favorited_by_users.count }}</span>
+            <!-- Блок интерактивных иконок (избранное и отзывы) -->
+            <div class="product-actions d-flex align-items-center gap-3">
+                <!-- Блок количества отзывов -->
+                <!-- Измените блок количества комментариев в шаблоне -->
+            <div class="comments-count-block d-flex align-items-center gap-1 text-warning">
+                {% bs_icon 'chat' extra_classes='comment-icon' %}
+                <span class="comments-count">{{ product.comments.count }}</span>
+            </div>
+
+
+                <!-- Блок избранного -->
+                <div class="favorite-block">
+                    <button
+                        class="btn btn-link p-0 {% if request.user == product.author %}disabled{% endif %} favorite-btn"
+                        data-product-favorite-toggle-url="{% url 'eshop:product_favorite_toggle' product.id %}"
+                        data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+                        data-login-url="{% url 'users:login' %}"
+                    >
+                        {% if request.user in product.favorited_by_users.all %}
+                            {% bs_icon 'star' extra_classes='favorite-icon icon-empty d-none' %}
+                            {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled' %}
+                        {% else %}
+                            {% bs_icon 'star' extra_classes='favorite-icon icon-empty' %}
+                            {% bs_icon 'star-fill' extra_classes='favorite-icon icon-filled d-none' %}
+                        {% endif %}
+                    </button>
+                    <span class="favorites-count">{{ product.favorited_by_users.count }}</span>
+                </div>
             </div>
         </div>
         <small class="product-date">
