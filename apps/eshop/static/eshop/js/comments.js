@@ -46,7 +46,7 @@ class CommentManager {
         commentErrorsElement.textContent = ''
 
         try {
-        const data = await postAction(url, formData)
+        const data = await productAction(url, formData)
 
         if (data.success) {
             // Очищаем текстовое поле

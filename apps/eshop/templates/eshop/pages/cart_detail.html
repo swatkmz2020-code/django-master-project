@@ -1,0 +1,67 @@
+{% extends "eshop/base.html" %}
+{% load static %}
+
+{% block page_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Ваша корзина</h2>
+
+    {% if cart.items.all %}
+        <div id="cart-content">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Цена</th>
+                            <th>Количество</th>
+                            <th>Сумма</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart.items.all %}
+                        <tr data-product-id="{{ item.product.id }}">
+                            <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></td>
+                            <td>{{ item.product.price }} ₽</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-secondary js-cart-action" 
+                                            data-url="{% url 'eshop:cart_decrease' item.product.id %}">−</button>
+
+                                    <span class="fw-bold px-1 js-item-quantity">{{ item.quantity }} шт.</span>
+
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-secondary js-cart-action" 
+                                            data-url="{% url 'eshop:cart_increase' item.product.id %}">+</button>
+                                </div>
+                            </td>
+                            <td><strong><span class="js-item-total">{{ item.total_price }}</span> ₽</strong></td>
+                            <td>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-danger js-cart-action" 
+                                        data-url="{% url 'eshop:cart_remove' item.product.id %}">Удалить</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-end mt-3">
+                <h4>Итого: <span id="cart-total-price">{{ cart.total_price }}</span> ₽</h4>
+            </div>
+        </div>
+
+        <div id="empty-cart-message" class="alert alert-info d-none">
+            Ваша корзина пока пуста. <a href="{% url 'eshop:product_list' %}">Перейти к товарам</a>.
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Ваша корзина пока пуста. <a href="{% url 'eshop:product_list' %}">Перейти к товарам</a>.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+

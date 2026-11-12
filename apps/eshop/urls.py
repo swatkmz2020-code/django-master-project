@@ -19,6 +19,13 @@ urlpatterns = [
     path('products/<int:product_id>/toggle-favorite/', views.product_favorite_toggle_view, name="product_favorite_toggle"),
     path("products/<int:product_id>/comments/add/", views.add_comment_view, name="add_comment"),
     path('products/<int:product_id>/comments/load-more/', views.load_more_comments_view, name="load_more_comments"),
-
+    path('cart/', views.CartDetailView.as_view(), name='cart_detail'),
+    path('products/<int:product_id>/cart/add/', views.add_to_cart_view, name='add_to_cart'),
+    path('cart/increase/<int:product_id>/', views.cart_increase_view, name='cart_increase'),
+    path('cart/decrease/<int:product_id>/', views.cart_decrease_view, name='cart_decrease'),
+    path('cart/remove/<int:product_id>/', views.cart_remove_view, name='cart_remove'),
 ]
+
+
+
 

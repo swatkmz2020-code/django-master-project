@@ -80,6 +80,13 @@
             </span>
             <span id="dislikesCount">{{ dislikes_count }}</span>
         </button>
+        {% if user.is_authenticated and user != product.author %}
+            <button type="button"
+                    class="btn btn-sm btn-primary add-to-cart-btn"
+                    data-url="{% url 'eshop:add_to_cart' product.id %}">
+                {% bs_icon 'cart-plus' %} В корзину
+            </button>
+        {% endif %}
     </div>
 
     <p>

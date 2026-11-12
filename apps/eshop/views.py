@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
 from django.http import JsonResponse
@@ -16,7 +17,8 @@ from django.views.generic import (
 )
 
 from eshop.forms import ProductForm
-from eshop.models import Category, Comment, Product, Tag
+from eshop.models import Cart, CartItem, Category, Comment, Product, Tag
+
 
 
 class HomePageView(TemplateView):
@@ -378,3 +380,85 @@ def load_more_comments_view(request, product_id):
         'html': comments_html,
         'has_more': has_more_comments
     })
+
+@login_required
+@require_POST
+def add_to_cart_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    
+    cart_item, created = CartItem.objects.get_or_create(
+        cart=cart,
+        product=product,
+        defaults={'quantity': 1}
+    )
+    
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    return JsonResponse({
+        'success': True,
+        'cart_count': cart.total_items,
+        'item_quantity': cart_item.quantity,
+        'message': f'Товар «{product.title}» добавлен в корзину'
+    })
+
+
+class CartDetailView(LoginRequiredMixin, DetailView):
+    model = Cart
+    template_name = 'eshop/pages/cart_detail.html'
+    context_object_name = 'cart'
+
+    def get_object(self, queryset=None):
+        cart, _ = Cart.objects.get_or_create(user=self.request.user)
+        return cart
+
+    
+@login_required
+@require_POST
+def cart_remove(request, product_id):
+    # Находим элемент корзины текущего пользователя по id товара и удаляем его
+    cart_item = get_object_or_404(CartItem, user=request.user, product_id=product_id)
+    cart_item.delete()
+    return redirect('cart_detail') # укажите имя вашего маршрута страницы корзины
+
+
+def get_cart_json_response(cart, item=None):
+    return JsonResponse({
+        'success': True,
+        'item_quantity': item.quantity if item else 0,
+        'item_total_price': f"{item.total_price:.2f}".replace('.', ',') if item else "0,00",
+        'cart_total_price': f"{cart.total_price:.2f}".replace('.', ','),
+        'cart_count': cart.total_items,
+    })
+
+@login_required
+def cart_increase_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+    return get_cart_json_response(cart, cart_item)
+
+@login_required
+def cart_decrease_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart_item = get_object_or_404(CartItem, cart__user=request.user, product=product)
+    cart = cart_item.cart
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+        return get_cart_json_response(cart, cart_item)
+    else:
+        cart_item.delete()
+        return get_cart_json_response(cart, None)
+
+@login_required
+def cart_remove_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart = get_object_or_404(Cart, user=request.user)
+    CartItem.objects.filter(cart=cart, product=product).delete()
+    return get_cart_json_response(cart, None)

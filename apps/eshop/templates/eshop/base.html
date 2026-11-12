@@ -130,6 +130,17 @@
                                 </a>
                             </li>
                         {% endif %}
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'eshop:cart_detail' %}">
+                                    {% bs_icon 'cart' %} Корзина
+                                    <span id="cartCounter" class="badge bg-primary rounded-pill">
+                                        {{ user.cart.total_items|default:0 }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+
                     </ul>
                 </div>
             </div>
@@ -164,6 +175,7 @@
         </div>
     {% endif %}
     {% bootstrap_javascript %}
+    <script type="module" src="{% static 'eshop/js/cart.js' %}"></script>
 </body>
 </html>
 
